@@ -10,9 +10,10 @@ import {
   
   export interface ReferralUser {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    date: string;
+    createdAt: string;
     purchases: number;
     spent: number;
     status: "active" | "inactive";
@@ -28,21 +29,24 @@ import {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[180px]">User</TableHead>
+              {/* <TableHead className="w-[180px]">User</TableHead> */}
+              <TableHead>First Name</TableHead>
+              <TableHead>Last Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Join Date</TableHead>
-              <TableHead className="text-right">Purchases</TableHead>
+              {/* <TableHead className="text-right">Purchases</TableHead>
               <TableHead className="text-right">Total Spent</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead className="text-center">Status</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="font-medium">{user.firstName}</TableCell>
+                <TableCell className="font-medium">{user.lastName}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.date}</TableCell>
-                <TableCell className="text-right">{user.purchases}</TableCell>
+                <TableCell>{user.createdAt}</TableCell>
+                {/* <TableCell className="text-right">{user.purchases}</TableCell>
                 <TableCell className="text-right">${user.spent.toLocaleString()}</TableCell>
                 <TableCell className="text-center">
                   <Badge 
@@ -55,7 +59,7 @@ import {
                   >
                     {user.status === "active" ? "Active" : "Inactive"}
                   </Badge>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

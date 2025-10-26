@@ -9,6 +9,8 @@ import { MetricCard } from "@/components/MetricCard";
 import Header from "@/components/Header";
 import { ReferralTable, ReferralUser } from "@/components/ReferralTable";
 import { AnalyticsChart } from "@/components/AnalyticsCharts";
+import Api from "@/utils/api";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data
 const mockChartData = [
@@ -59,28 +61,47 @@ const mockEarningsData = [
 ];
 
 export default function Analytics() {
-  const { userData } = useUser();
-
+  const { userData, token } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
   const [totalReferrals, setTotalReferrals] = useState(0);
   const [totalPurchases, setTotalPurchases] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [users, setUsers] = useState<any[]>([]);
   const referralCode = userData?.referralCode;
 
   // Calculate summary metrics
   useEffect(() => {
-    setTotalReferrals(
-      mockChartData.reduce((sum, item) => sum + item.referrals, 0)
-    );
-    setTotalPurchases(
-      mockChartData.reduce((sum, item) => sum + item.purchases, 0)
-    );
-    setTotalEarnings(
-      mockChartData.reduce((sum, item) => sum + item.earnings, 0)
-    );
-  }, []);
+    if (!userData?._id) return;
+    const fetchPartnerStats = async () => {
+      try {
+        setIsLoading(true);
+        const response = await Api.get(`partner/${userData?._id}/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status === 200) {
+          setTotalReferrals(response.data.referralsCount);
+          setTotalPurchases(response.data.totalPurchases);
+          setTotalEarnings(response.data.totalEarnings);
+          setUsers(response.data.referrals);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+      }
+    };
+    fetchPartnerStats();
+  }, [userData?._id]);
 
   const copyReferralCode = () => {
-    navigator.clipboard.writeText(referralCode as string);
+    if (!referralCode) {
+      toast({ title: "Referral code not available" });
+      return;
+    }
+
+    navigator.clipboard.writeText(referralCode);
+    toast({ title: "Code copied" });
   };
 
   return (
@@ -135,14 +156,14 @@ export default function Analytics() {
           />
           <MetricCard
             title="Total Earnings"
-            value={`$${totalEarnings.toLocaleString()}`}
+            value={`₦${totalEarnings.toLocaleString()}`}
             icon={<DollarSign className="h-4 w-4" />}
             trend={{ value: 14, positive: true }}
           />
         </div>
 
         {/* Performance Overview */}
-        <div className="space-y-8">
+        {/* <div className="space-y-8">
           <h2 className="text-xl font-semibold">Performance Overview</h2>
           <AnalyticsChart
             title="Monthly Performance"
@@ -153,12 +174,12 @@ export default function Analytics() {
               { key: "earnings", name: "Earnings ($)", color: "#EB4785" },
             ]}
           />
-        </div>
+        </div> */}
 
         {/* Full Referral List */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">All Referred Users</h2>
-          <ReferralTable users={mockReferralUsers} />
+          <ReferralTable users={users} />
         </div>
       </div>
     </div>

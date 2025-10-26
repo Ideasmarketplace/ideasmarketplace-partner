@@ -46,7 +46,6 @@ const Login = () => {
         router.push(HOME);
       }
     } catch (error: any) {
-      console.log(error)
       setIsLoading(false);
 
       toast({
@@ -158,7 +157,7 @@ const Login = () => {
                   disabled={isLoading || !email || !password}
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
                 >
-                  Sign In
+                  {isLoading ? "Please wait..." : "Sign In"}
                 </Button>
               </form>
             </CardContent>
