@@ -17,7 +17,7 @@ const Header = () => {
   const router = useRouter();
 
   return (
-    <div>
+    <div className="px-5 md:px-16">
       <header className="w-full flex justify-between h-20 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2">
           <div className="cursor-pointer">
