@@ -60,7 +60,6 @@ const Login = () => {
     <div className="min-h-screen relative overflow-hidden">
       {/* Background Images */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20" />
         <img
           src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
           alt="Background"
@@ -84,7 +83,7 @@ const Login = () => {
         <div className="w-full max-w-md animate-fade-in">
           {/* Logo/Brand */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-md rounded-full mb-4 border border-white/20">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white backdrop-blur-md rounded-full mb-4 border border-white/20">
               <User className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Welcome</h1>

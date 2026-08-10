@@ -1,559 +1,516 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  CardToolbar,
-} from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
-import {
-  Area,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  Briefcase,
-  Copy,
-  ShoppingCart,
-  TrendingDown,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-} from "@/components/ui/chart";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import Header from "@/components/Header";
-import { useUser } from "@/hooks/use-user";
+import StatCard from "@/components/dashboard/StatCard";
+import EarningsChart from "@/components/dashboard/EarningsChart";
+import ReferralCard from "@/components/dashboard/ReferralCard";
+import QuickActions from "@/components/dashboard/QuickActions";
+import ActivityCard from "@/components/dashboard/ActivityCard";
+import PerformanceCard from "@/components/dashboard/PerformanceCard";
+import CommunityCard from "@/components/dashboard/CommunityCard";
+import HeroIllustration from "@/components/HeroIllustration";
+
 import Api from "@/utils/api";
-import { toast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+import { useUser } from "@/hooks/use-user";
 
-function formatNumber(n: number) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
-  if (n >= 1_000) return n.toLocaleString();
-  return n.toString();
+/* =========================================================
+   Types
+========================================================= */
+
+interface DashboardAssetCategory {
+  totalAssets?: number;
+  publishedAssets?: number;
+  draftAssets?: number;
+  totalBuyers?: number;
+  averagePrice?: number;
 }
 
-const MONTH_MAP: Record<string, string> = {
-  January: "JAN",
-  February: "FEB",
-  March: "MAR",
-  April: "APR",
-  May: "MAY",
-  June: "JUN",
-  July: "JUL",
-  August: "AUG",
-  September: "SEP",
-  October: "OCT",
-  November: "NOV",
-  December: "DEC",
-};
+interface DashboardAssets {
+  audio?: DashboardAssetCategory;
+  visual?: DashboardAssetCategory;
+}
 
-export default function StatisticCard2() {
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>("12m");
-  const { userData, token } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalReferrals, setTotalReferrals] = useState(0);
-  const [totalPurchases, setTotalPurchases] = useState(0);
-  const [totalEarnings, setTotalEarnings] = useState(0);
-  const [users, setUsers] = useState<any[]>([]);
-  const [cashflowData, setCashflowData] = useState<
-    {
-      month: string;
-      value: number;
-    }[]
-  >([]);
-  const referralCode = userData?.referralCode;
+interface DashboardRevenue {
+  totalRevenue?: number;
+  totalEarnings?: number;
+  availableBalance?: number;
+  totalWithdrawn?: number;
+}
 
-  // Calculate summary metrics
-  useEffect(() => {
-    if (!userData?._id) return;
-    const fetchPartnerStats = async () => {
-      try {
-        setIsLoading(true);
-        const response = await Api.get(`partner/${userData?._id}/stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.status === 200) {
-          setTotalReferrals(response.data.referralsCount);
-          setTotalPurchases(response.data.totalPurchases);
-          setTotalEarnings(response.data.totalEarnings);
-          setUsers(response.data.referrals);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        setIsLoading(false);
-      }
-    };
-    fetchPartnerStats();
-  }, [userData?._id]);
+interface DashboardNetwork {
+  totalMembers?: number;
+  activeMembers?: number;
+  totalAssets?: number;
+}
 
-  useEffect(() => {
-    if (!userData?._id) return;
+interface DashboardPartner {
+  _id: string;
+  companyName: string;
+  referralCode?: string;
+}
 
-    const fetchCashflow = async () => {
-      try {
-        const year = new Date().getFullYear();
+interface MonthlyRevenue {
+  month: string;
+  totalCommission: number;
+}
 
-        const response = await Api.get(
-          `partner/monthly-revenue/${userData?._id}?year=${year}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+interface DashboardData {
+  partner: DashboardPartner;
+  assets: DashboardAssets;
+  revenue: DashboardRevenue;
+  network: DashboardNetwork;
+  monthlyRevenue: MonthlyRevenue[];
+  recentTransactions: unknown[];
+  recentMembers: unknown[];
+}
 
-        if (response.status === 200) {
-          const data = response.data.monthlyCommission.map(
-            (item: { month: string; totalCommission: number }) => ({
-              month: MONTH_MAP[item.month],
-              value: item.totalCommission,
-            }),
-          );
+/* =========================================================
+   Skeleton Components
+========================================================= */
 
-          setCashflowData(data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+function DashboardSkeleton() {
+  return (
+    <main className="flex-1">
+      <div className="space-y-6 animate-pulse">
+        {/* Hero Skeleton */}
+        <section className="relative overflow-hidden rounded-3xl bg-gray-100 px-10 py-10">
+          <div className="relative flex flex-col items-center justify-between gap-10 xl:flex-row">
+            <div className="w-full max-w-2xl">
+              <div className="h-8 w-40 rounded-full bg-gray-200" />
 
-    fetchCashflow();
-  }, [userData?._id, token]);
+              <div className="mt-5 h-14 w-3/4 rounded-xl bg-gray-200" />
 
-  const cards = [
-    {
-      icon: ShoppingCart,
-      iconColor: "text-blue-600",
-      title: "Total Earnings",
-      badge: {
-        color: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
-        icon: TrendingUp,
-        iconColor: "text-blue-500",
-        text: "+3.7%", // optional: compute later
-      },
-      value: totalEarnings,
-      isCurrency: true,
-      dateRange: "Total amount made from sales",
-    },
-    {
-      icon: Briefcase,
-      iconColor: "text-green-600",
-      title: "Active Projects",
-      badge: {
-        color:
-          "bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400",
-        icon: TrendingUp,
-        iconColor: "text-green-500",
-        text: "+12.8%",
-      },
-      value: 0,
-      dateRange: "Total audio projects",
-    },
-    {
-      icon: ShoppingCart,
-      iconColor: "text-orange-600",
-      title: "Total Purchases",
-      badge: {
-        color:
-          "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
-        icon: TrendingUp,
-        iconColor: "text-orange-500",
-        text: "+3.7%",
-      },
-      value: totalPurchases,
-      dateRange: "Total sales made on all projects",
-    },
-    {
-      icon: Users,
-      iconColor: "text-pink-600",
-      title: "Referred Users",
-      badge: {
-        color: "bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-400",
-        icon: TrendingDown,
-        iconColor: "text-pink-500",
-        text: "-2.1%",
-      },
-      value: totalReferrals,
-      dateRange: "Total users referred",
-    },
-  ];
+              <div className="mt-5 space-y-3">
+                <div className="h-5 w-full rounded bg-gray-200" />
+                <div className="h-5 w-5/6 rounded bg-gray-200" />
+                <div className="h-5 w-2/3 rounded bg-gray-200" />
+              </div>
 
-  const chartConfig = {
-    value: {
-      label: "Monthly Commission",
-      color: "bg-violet-500",
-    },
-  } satisfies ChartConfig;
+              <div className="mt-8 flex gap-4">
+                <div className="h-12 w-32 rounded-xl bg-gray-200" />
+                <div className="h-12 w-36 rounded-xl bg-gray-200" />
+              </div>
+            </div>
 
-  interface TooltipProps {
-    active?: boolean;
-    payload?: Array<{
-      dataKey: string;
-      value: number;
-      color: string;
-    }>;
-    label?: string;
-  }
+            <div className="h-64 w-64 rounded-3xl bg-gray-200" />
+          </div>
+        </section>
 
-  const CustomTooltip = ({ active, payload }: TooltipProps) => {
-    if (active && payload && payload.length) {
-      return (
-        <>
-          <div className="rounded-lg bg-zinc-900 text-white p-3 shadow-lg">
-            <div className="text-xs font-medium mb-1">Total:</div>
-            <div className="text-sm font-semibold">
-              ₦{payload[0].value.toLocaleString()}
+        {/* Stats Skeleton */}
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="w-full">
+                  <div className="h-4 w-40 rounded bg-gray-200" />
+                  <div className="mt-3 h-9 w-28 rounded bg-gray-200" />
+                </div>
+
+                <div className="h-14 w-14 shrink-0 rounded-2xl bg-gray-200" />
+              </div>
+
+              <div className="mt-6 h-4 w-48 rounded bg-gray-200" />
+            </div>
+          ))}
+        </section>
+
+        {/* Earnings Chart Skeleton */}
+        <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="h-6 w-48 rounded bg-gray-200" />
+          <div className="mt-6 h-72 w-full rounded-xl bg-gray-100" />
+        </section>
+
+        {/* Activity + Referral Skeleton */}
+        <section className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 rounded-2xl bg-gray-100 p-6 xl:col-span-7">
+            <div className="h-6 w-40 rounded bg-gray-200" />
+            <div className="mt-6 space-y-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="h-14 rounded-xl bg-gray-200" />
+              ))}
             </div>
           </div>
-        </>
-      );
-    }
-    return null;
-  };
-  // Period configuration
-  const PERIODS = {
-    "3m": {
-      key: "3m",
-      label: "3 months",
-      dateRange: "Last 3 months",
+
+          <div className="col-span-12 rounded-2xl bg-gray-100 p-6 md:col-span-6 xl:col-span-5">
+            <div className="h-6 w-40 rounded bg-gray-200" />
+            <div className="mt-6 h-32 rounded-xl bg-gray-200" />
+          </div>
+        </section>
+
+        {/* Bottom Skeleton */}
+        <section className="grid grid-cols-12 gap-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="col-span-12 rounded-2xl bg-gray-100 p-6 md:col-span-6 xl:col-span-4"
+            >
+              <div className="h-6 w-40 rounded bg-gray-200" />
+              <div className="mt-6 h-40 rounded-xl bg-gray-200" />
+            </div>
+          ))}
+        </section>
+      </div>
+    </main>
+  );
+}
+
+/* =========================================================
+   Dashboard Page
+========================================================= */
+
+export default function DashboardPage() {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const badgeRef = useRef<HTMLSpanElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+  const buttonsRef = useRef<HTMLDivElement | null>(null);
+
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState<string | null>(null);
+
+  const { userData } = useUser();
+
+  /* =========================================================
+     Fetch Dashboard Overview
+  ========================================================= */
+
+  useEffect(() => {
+    const fetchDashboardOverview = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await Api.get("partner/dashboard/overview");
+
+        console.log("Dashboard overview:", response.data);
+
+        if (response.data?.success) {
+          setDashboard(response.data.data as DashboardData);
+        } else {
+          setError(response.data?.message || "Unable to load dashboard data.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard overview:", error);
+
+        setError("Unable to load your dashboard. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardOverview();
+  }, []);
+
+  /* =========================================================
+     GSAP Animation
+  ========================================================= */
+
+  useGSAP(
+    () => {
+      if (loading || !dashboard) return;
+
+      const tl = gsap.timeline({
+        defaults: {
+          ease: "power3.out",
+        },
+      });
+
+      tl.fromTo(
+        sectionRef.current,
+        {
+          opacity: 0,
+          y: 30,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+        },
+      )
+        .fromTo(
+          badgeRef.current,
+          {
+            opacity: 0,
+            y: -10,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+          },
+          "-=0.4",
+        )
+        .fromTo(
+          titleRef.current,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+          },
+          "-=0.2",
+        )
+        .fromTo(
+          paragraphRef.current,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+          },
+          "-=0.4",
+        )
+        .fromTo(
+          buttonsRef.current?.children || [],
+          {
+            opacity: 0,
+            y: 15,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.1,
+          },
+          "-=0.3",
+        );
     },
-    "6m": {
-      key: "6m",
-      label: "6 months",
-      dateRange: "Last 6 months",
+    {
+      scope: sectionRef,
+      dependencies: [loading, dashboard],
     },
-    "9m": {
-      key: "9m",
-      label: "9 months",
-      dateRange: "Last 9 months",
-    },
-    "12m": {
-      key: "12m",
-      label: "12 months",
-      dateRange: "Last 12 months",
-    },
-  } as const;
+  );
 
-  type PeriodKey = keyof typeof PERIODS;
+  /* =========================================================
+     Loading
+  ========================================================= */
 
-  // Filter data based on selected period
-  const getFilteredData = () => {
-    switch (selectedPeriod) {
-      case "3m":
-        return cashflowData.slice(-3);
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
-      case "6m":
-        return cashflowData.slice(-6);
+  /* =========================================================
+     Error
+  ========================================================= */
 
-      case "9m":
-        return cashflowData.slice(-9);
+  if (error || !dashboard) {
+    return (
+      <main className="flex-1">
+        <div className="flex min-h-[500px] items-center justify-center">
+          <div className="max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+            <h2 className="text-xl font-semibold text-red-700">
+              Unable to load dashboard
+            </h2>
 
-      case "12m":
-      default:
-        return cashflowData;
-    }
-  };
+            <p className="mt-2 text-sm text-red-600">
+              {error || "Dashboard information is currently unavailable."}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
-  const filteredData = getFilteredData();
-  
-  // Get current period configuration
-  const currentPeriod = PERIODS[selectedPeriod];
-  // Calculate total and percentage based on filtered data
-  const totalCash = filteredData.reduce((sum, item) => sum + item.value, 0);
-  const lastValue = filteredData[filteredData.length - 1]?.value || 0;
-  const previousValue = filteredData[filteredData.length - 2]?.value || 0;
-  const percentageChange =
-    previousValue > 0 ? ((lastValue - previousValue) / previousValue) * 100 : 0;
+  /* =========================================================
+     Normalize API Data
+  ========================================================= */
 
-  const copyReferralCode = () => {
-    if (!referralCode) {
-      toast({ title: "Referral code not available" });
-      return;
-    }
+  const audioAssets = dashboard.assets?.audio?.totalAssets ?? 0;
 
-    navigator.clipboard.writeText(referralCode);
-    toast({ title: "Code copied" });
-  };
+  const visualAssets = dashboard.assets?.visual?.totalAssets ?? 0;
+
+  const personalAssets = audioAssets + visualAssets;
+
+  const networkMembers = dashboard.network?.totalMembers ?? 0;
+
+  const networkAssets = dashboard.network?.totalAssets ?? 0;
+
+  const totalEarnings = dashboard.revenue?.totalEarnings ?? 0;
+
+  /* =========================================================
+     Render
+  ========================================================= */
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="space-y-1 py-20 bg-blue-600 px-5 md:px-16">
-        <h1 className="text-3xl md:text-5xl text-white">
-          Welcome, <span className="font-bold">{userData?.companyName}</span>
-        </h1>
-        <p className="text-white text-md tracking-tighter">
-          Track your earnings at a glance.
-        </p>
+    <main className="flex-1">
+      <div ref={sectionRef} className="space-y-6">
+        {/* =====================================================
+            Hero Banner
+        ===================================================== */}
+
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-100 via-blue-50 to-indigo-100 px-6 py-8 shadow-sm sm:px-10 sm:py-10">
+          <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-300/20 blur-3xl" />
+
+          <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-cyan-300/20 blur-3xl" />
+
+          <div className="relative flex flex-col items-center justify-between gap-10 xl:flex-row">
+            <div className="max-w-2xl">
+              <span
+                ref={badgeRef}
+                className="inline-block rounded-full bg-white px-4 py-2 text-sm font-semibold text-sky-700 shadow"
+              >
+                Dashboard Overview
+              </span>
+
+              <h1
+                ref={titleRef}
+                className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+              >
+                Welcome, {dashboard.partner?.companyName || "Partner"}
+              </h1>
+
+              <p
+                ref={paragraphRef}
+                className="mt-5 text-base leading-8 text-slate-600 sm:text-lg"
+              >
+                Manage your digital assets, community members, reports,
+                referrals, and earnings from one beautifully organized
+                workspace.
+              </p>
+
+              <div ref={buttonsRef} className="mt-8 flex flex-wrap gap-4">
+                <button className="rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white transition hover:bg-indigo-700">
+                  My Assets
+                </button>
+
+                <button className="rounded-xl border border-sky-200 bg-white px-6 py-3 font-medium text-sky-700 transition hover:bg-sky-50">
+                  View Reports
+                </button>
+              </div>
+            </div>
+
+            <HeroIllustration />
+          </div>
+        </section>
+
+        {/* =====================================================
+            Stats
+        ===================================================== */}
+
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            type="assets"
+            data={{
+              value: personalAssets,
+              changeLabel: "Total digital assets in your personal portfolio.",
+            }}
+          />
+
+          <StatCard
+            type="members"
+            data={{
+              value: networkMembers,
+              changeLabel: "Total members in your partner network.",
+            }}
+          />
+
+          <StatCard
+            type="network"
+            data={{
+              value: networkAssets,
+              changeLabel: "Total digital assets generated by your network.",
+            }}
+          />
+
+          <StatCard
+            type="earnings"
+            data={{
+              value: totalEarnings,
+              changeLabel:
+                "Net earnings from your asset sales after commission deductions.",
+            }}
+          />
+        </section>
+
+        {/* =====================================================
+            Earnings Chart
+        ===================================================== */}
+
+        <section className="grid grid-cols-12 gap-6">
+          <div className="col-span-12">
+            <EarningsChart
+              monthlyRevenue={dashboard.monthlyRevenue}
+              totalEarnings={dashboard.revenue?.totalEarnings ?? 0}
+            />
+          </div>
+        </section>
+
+        {/* =====================================================
+            Activity + Referrals
+        ===================================================== */}
+
+        <section className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 md:col-span-6 xl:col-span-5">
+            <ReferralCard
+              referralCode={dashboard?.partner?.referralCode}
+              totalMembers={dashboard?.network?.totalMembers}
+            />
+          </div>
+
+          <div className="col-span-12 md:col-span-6 xl:col-span-7">
+            <PerformanceCard
+              metrics={[
+                {
+                  label: "Assets Published",
+                  value: (
+                    (dashboard.assets?.audio?.publishedAssets ?? 0) +
+                    (dashboard.assets?.visual?.publishedAssets ?? 0)
+                  ).toLocaleString(),
+                },
+                {
+                  label: "Revenue",
+                  value: `₦${(
+                    dashboard.revenue?.totalRevenue ?? 0
+                  ).toLocaleString()}`,
+                },
+                {
+                  label: "Network Members",
+                  value: (
+                    dashboard.network?.totalMembers ?? 0
+                  ).toLocaleString(),
+                },
+              ]}
+            />
+          </div>
+        </section>
+
+        {/* =====================================================
+            Bottom Row
+        ===================================================== */}
+
+        <section className="grid grid-cols-12 gap-6">
+
+          <div className="col-span-12 xl:col-span-7">
+            <ActivityCard />
+          </div>
+
+          <div className="col-span-12 md:col-span-6 xl:col-span-5">
+            <CommunityCard
+              totalMembers={dashboard?.network?.totalMembers}
+              activeMembers={dashboard?.network?.activeMembers}
+            />
+          </div>
+
+          {/* <div className="col-span-12 xl:col-span-4">
+            <QuickActions />
+          </div> */}
+        </section>
       </div>
-      <div className="px-5 md:px-16">
-        <div className="grow container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 z-10 -mt-10">
-          {cards.map((card, i) => (
-            <Card key={i}>
-              <CardContent className="flex flex-col h-full">
-                {/* Title & Badge */}
-                <div className="flex items-center justify-between mb-8">
-                  <card.icon className={cn("size-6", card.iconColor)} />
-                  {/* <Badge
-                    className={cn("px-2 py-1 rounded-full", card.badge.color)}
-                  >
-                    <card.badge.icon
-                      className={`w-3 h-3 ${card.badge.iconColor}`}
-                    />
-                    {card.badge.text}
-                  </Badge> */}
-                </div>
-                {/* Value & Date Range */}
-                <div className="flex-1 flex flex-col justify-between grow">
-                  {/* Value */}
-                  <div>
-                    <div className="text-base font-medium text-muted-foreground mb-1">
-                      {card.title}
-                    </div>
-                    <div className="text-3xl font-bold text-foreground mb-6">
-                      {card.value.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="pt-3 border-t border-muted text-xs text-muted-foreground font-medium">
-                    {card.dateRange}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="grow container grid grid-cols-1 sm:grid-cols-2 gap-6 mt-20">
-          <Card className="w-full">
-            <CardHeader className="border-0 min-h-auto pt-6 pb-4">
-              <CardTitle className="text-lg font-semibold">Cashflow</CardTitle>
-              <CardToolbar>
-                <Select
-                  value={selectedPeriod}
-                  onValueChange={(value) =>
-                    setSelectedPeriod(value as PeriodKey)
-                  }
-                >
-                  <SelectTrigger>{currentPeriod.label}</SelectTrigger>
-                  <SelectContent align="end">
-                    {Object.values(PERIODS).map((period) => (
-                      <SelectItem key={period.key} value={period.key}>
-                        {period.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </CardToolbar>
-            </CardHeader>
-            <CardContent className="px-0">
-              {/* Stats Section */}
-              <div className="px-5 mb-8">
-                <div className="text-xs font-medium text-muted-foreground tracking-wide mb-2">
-                  {currentPeriod.dateRange}
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="text-3xl font-bold">
-                    ₦{totalCash.toLocaleString()}
-                  </div>
-                  <Badge>
-                    <TrendingUp className="size-3" />
-                    {Math.abs(percentageChange).toFixed(2)}%
-                  </Badge>
-                </div>
-              </div>
-              {/* Chart */}
-              <div className="relative">
-                <ChartContainer
-                  config={chartConfig}
-                  className="h-[300px] w-full ps-1.5 pe-2.5 overflow-visible [&_.recharts-curve.recharts-tooltip-cursor]:stroke-initial"
-                >
-                  <ComposedChart
-                    data={filteredData}
-                    margin={{
-                      top: 25,
-                      right: 25,
-                      left: 0,
-                      bottom: 25,
-                    }}
-                    style={{ overflow: "visible" }}
-                  >
-                    {/* Gradient */}
-                    <defs>
-                      <linearGradient
-                        id="cashflowGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor={chartConfig.value.color}
-                          stopOpacity={0.15}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor={chartConfig.value.color}
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <filter
-                        id="dotShadow"
-                        x="-50%"
-                        y="-50%"
-                        width="200%"
-                        height="200%"
-                      >
-                        <feDropShadow
-                          dx="2"
-                          dy="2"
-                          stdDeviation="3"
-                          floodColor="rgba(0,0,0,0.5)"
-                        />
-                      </filter>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="4 12"
-                      stroke="var(--input)"
-                      strokeOpacity={1}
-                      horizontal={true}
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="month"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 12 }}
-                      tickMargin={12}
-                      dy={10}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => formatNumber(value)}
-                      domain={[0, "dataMax + 1000"]}
-                      tickCount={6}
-                      tickMargin={12}
-                    />
-                    <ChartTooltip
-                      content={<CustomTooltip />}
-                      cursor={{
-                        stroke: chartConfig.value.color,
-                        strokeWidth: 1,
-                        strokeDasharray: "none",
-                      }}
-                    />
-                    {/* Gradient area */}
-                    <Area
-                      type="linear"
-                      dataKey="value"
-                      stroke="transparent"
-                      fill="url(#cashflowGradient)"
-                      strokeWidth={0}
-                      dot={false}
-                    />
-                    {/* Main cashflow line */}
-                    <Line
-                      type="linear"
-                      dataKey="value"
-                      stroke={chartConfig.value.color}
-                      strokeWidth={3}
-                      dot={(props) => {
-                        const { cx, cy, payload } = props;
-                        const highestValue = Math.max(
-                          ...cashflowData.map((d) => d.value),
-                          0,
-                        );
-                        if (
-                          payload.value === highestValue &&
-                          highestValue > 0
-                        ) {
-                          return (
-                            <circle
-                              key={`dot-${cx}-${cy}`}
-                              cx={cx}
-                              cy={cy}
-                              r={6}
-                              fill={chartConfig.value.color}
-                              stroke="white"
-                              strokeWidth={2}
-                              filter="url(#dotShadow)"
-                            />
-                          );
-                        }
-                        return <g key={`dot-${cx}-${cy}`} />;
-                      }}
-                      activeDot={{
-                        r: 6,
-                        fill: chartConfig.value.color,
-                        stroke: "white",
-                        strokeWidth: 2,
-                        filter: "url(#dotShadow)",
-                      }}
-                    />
-                  </ComposedChart>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="w-full max-w-xl rounded-2xl shadow-xl border-0 bg-zinc-900  text-white">
-            <CardHeader className="border-0 flex flex-col items-start pt-6">
-              <CardTitle className="text-lg font-semibold text-white">
-                Refer People
-              </CardTitle>
-              <CardDescription className="text-zinc-400">
-                Share your code with your community and start earning
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="border-b border-zinc-700 mb-10 mt-5" />
-              <div className="flex items-end gap-2 mb-5">
-                <span className="text-2xl md:text-5xl font-bold tracking-tight text-center text-white">
-                  Earn 5% commissions on every purchase they make.
-                </span>
-              </div>
-              <div className="border-b border-zinc-700 mb-6 mt-20" />
-              {/* Segmented Progress Bar */}
-              <div className="flex flex-col w-full mb-3">
-                <div className="flex items-center justify-between bg-yellow-400 px-4 py-3 rounded-md">
-                  <code className="text-lg font-mono font-semibold">
-                    {referralCode}
-                  </code>
-                  <Button
-                    size="sm"
-                    className="bg-white text-black hover:bg-yellow-800 hover:text-white"
-                    onClick={copyReferralCode}
-                  >
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }
