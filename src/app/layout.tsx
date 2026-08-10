@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Sora } from "next/font/google";
+import { Sora, Zilla_Slab } from "next/font/google";
 import "./globals.css";
 import { twMerge } from "tailwind-merge";
-import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "@/context/user-content";
+import { Toaster } from "sonner";
 
 const sora = Sora({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const zillaSlab = Zilla_Slab({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-zilla",
 });
 
 export const metadata: Metadata = {
@@ -26,9 +32,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={twMerge(sora.className, "antialiased")}>
+      <body className={twMerge(zillaSlab.className, "antialiased")}>
         <UserProvider>{children}</UserProvider>
-        <Toaster />
+        <Toaster richColors position="top-right" />
+        {/* <Toaster /> */}
       </body>
     </html>
   );
