@@ -26,15 +26,6 @@ export const revenueMetrics: RevenueMetrics = {
   pendingTransactions: 11,
 };
 
-export const revenueChartData: RevenueChartData[] = [
-  { month: "Jan", revenue: 12800 },
-  { month: "Feb", revenue: 15600 },
-  { month: "Mar", revenue: 18100 },
-  { month: "Apr", revenue: 22300 },
-  { month: "May", revenue: 26850 },
-  { month: "Jun", revenue: 32450 },
-];
-
 export const revenueBreakdown: RevenueBreakdownItem[] = [
   {
     source: "Asset Sale",
