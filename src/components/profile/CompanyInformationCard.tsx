@@ -8,12 +8,25 @@ import Api from "@/utils/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 interface CompanyInformationCardProps {
   profile: any;
-  refresh: () => Promise<void>;
+  refresh?: () => Promise<void>;
 }
+
+interface CompanyForm {
+  companyName: string;
+  industry: string;
+  representativeName: string;
+  role: string;
+}
+
+const initialForm: CompanyForm = {
+  companyName: "",
+  industry: "",
+  representativeName: "",
+  role: "",
+};
 
 export default function CompanyInformationCard({
   profile,
@@ -21,12 +34,8 @@ export default function CompanyInformationCard({
 }: CompanyInformationCardProps) {
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    companyName: "",
-    industry: "",
-    representativeName: "",
-    role: "",
-  });
+  const [form, setForm] =
+    useState<CompanyForm>(initialForm);
 
   useEffect(() => {
     if (!profile) return;
@@ -34,7 +43,8 @@ export default function CompanyInformationCard({
     setForm({
       companyName: profile.companyName ?? "",
       industry: profile.industry ?? "",
-      representativeName: profile.representativeName ?? "",
+      representativeName:
+        profile.representativeName ?? "",
       role: profile.role ?? "",
     });
   }, [profile]);
@@ -43,17 +53,30 @@ export default function CompanyInformationCard({
     try {
       setLoading(true);
 
-      await Api.put("/partner/profile", form);
+      await Api.put("/partner/profile", {
+        companyName: form.companyName,
+        industry: form.industry,
+        representativeName: form.representativeName,
+        role: form.role,
+      });
 
-      await refresh();
+      if (refresh) {
+        await refresh();
+      }
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Failed to update company information:",
+        error,
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  function updateField(key: keyof typeof form, value: string) {
+  function updateField(
+    key: keyof CompanyForm,
+    value: string,
+  ) {
     setForm((prev) => ({
       ...prev,
       [key]: value,
@@ -62,14 +85,16 @@ export default function CompanyInformationCard({
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b p-6">
+      <div className="flex flex-col md:flex-row items-start gap-4 md:items-center justify-between border-b p-6">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-indigo-50 p-3">
             <Building2 className="h-6 w-6 text-indigo-600" />
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold">Company Information</h2>
+            <h2 className="text-xl font-semibold">
+              Company Information
+            </h2>
 
             <p className="text-sm text-muted-foreground">
               Information displayed across your partner profile.
@@ -77,9 +102,13 @@ export default function CompanyInformationCard({
           </div>
         </div>
 
-        <Button onClick={handleSubmit} disabled={loading}>
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           <Save className="mr-2 h-4 w-4" />
-          Save
+
+          {loading ? "Saving..." : "Save"}
         </Button>
       </div>
 
@@ -89,7 +118,12 @@ export default function CompanyInformationCard({
 
           <Input
             value={form.companyName}
-            onChange={(e) => updateField("companyName", e.target.value)}
+            onChange={(e) =>
+              updateField(
+                "companyName",
+                e.target.value,
+              )
+            }
           />
         </div>
 
@@ -98,7 +132,12 @@ export default function CompanyInformationCard({
 
           <Input
             value={form.industry}
-            onChange={(e) => updateField("industry", e.target.value)}
+            onChange={(e) =>
+              updateField(
+                "industry",
+                e.target.value,
+              )
+            }
           />
         </div>
 
@@ -107,7 +146,12 @@ export default function CompanyInformationCard({
 
           <Input
             value={form.representativeName}
-            onChange={(e) => updateField("representativeName", e.target.value)}
+            onChange={(e) =>
+              updateField(
+                "representativeName",
+                e.target.value,
+              )
+            }
           />
         </div>
 
@@ -116,7 +160,12 @@ export default function CompanyInformationCard({
 
           <Input
             value={form.role}
-            onChange={(e) => updateField("role", e.target.value)}
+            onChange={(e) =>
+              updateField(
+                "role",
+                e.target.value,
+              )
+            }
           />
         </div>
       </div>

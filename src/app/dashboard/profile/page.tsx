@@ -23,10 +23,9 @@ import {
   LogoUploader,
   ChangePasswordCard,
 } from "@/components/profile";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUserStore } from "@/utils/user-store";
 
 interface Profile {
   companyName?: string;
@@ -52,41 +51,9 @@ interface Completion {
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
-
   const [completion, setCompletion] = useState<Completion | null>(null);
-
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  async function loadProfile() {
-    try {
-      setLoading(true);
-
-      // TODO: Connect your profile API here.
-      //
-      // const response = await Api.get("/partner/profile");
-      //
-      // setProfile(response.data.data.profile);
-      // setCompletion(response.data.data.completion);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <main className="min-w-0 flex-1">
-          <div className="space-y-6">Loading...</div>
-        </main>
-      </div>
-    );
-  }
+  const userData = useUserStore((state) => state.userData);
 
   return (
     <div className="min-h-screen">
@@ -124,13 +91,13 @@ export default function ProfilePage() {
                 <section className="grid gap-6 xl:grid-cols-1">
                   {/* Profile Information */}
 
-                  <Card className="rounded-3xl border border-gray-100 shadow-sm xl:col-span-2">
+                  <Card className="rounded-3xl border border-gray-100 py-3 xl:py-0 shadow-sm xl:col-span-2">
                     <CardHeader>
                       <CardTitle className="text-xl">
                         Profile Information
                       </CardTitle>
 
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground mb-3">
                         Your company, community and contact information.
                       </p>
                     </CardHeader>
@@ -140,10 +107,10 @@ export default function ProfilePage() {
 
                       <div className="mb-8 flex flex-col gap-5 border-b pb-8 sm:flex-row sm:items-center">
                         <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gray-100">
-                          {profile?.logo || profile?.profileImage ? (
+                          {userData?.photo ? (
                             <img
-                              src={profile.logo || profile.profileImage}
-                              alt={profile.companyName || "Profile"}
+                              src={userData?.photo}
+                              alt={userData.companyName || "userData"}
                               className="h-full w-full object-cover"
                             />
                           ) : (
@@ -153,17 +120,17 @@ export default function ProfilePage() {
 
                         <div>
                           <h2 className="text-2xl font-bold">
-                            {profile?.companyName || "Company Name"}
+                            {userData?.companyName || "Company Name"}
                           </h2>
 
                           <p className="mt-1 text-sm text-muted-foreground">
-                            {profile?.industry || "Industry not specified"}
+                            {userData?.industry || "Industry not specified"}
                           </p>
 
-                          {profile?.location && (
+                          {userData?.location && (
                             <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                               <MapPin className="h-4 w-4" />
-                              {profile.location}
+                              {userData.location}
                             </div>
                           )}
                         </div>
@@ -187,25 +154,25 @@ export default function ProfilePage() {
                             <ProfileInfoRow
                               icon={Building2}
                               label="Company Name"
-                              value={profile?.companyName}
+                              value={userData?.companyName}
                             />
 
                             <ProfileInfoRow
                               icon={BriefcaseBusiness}
                               label="Industry"
-                              value={profile?.industry}
+                              value={userData?.industry}
                             />
 
                             <ProfileInfoRow
                               icon={User}
                               label="Representative"
-                              value={profile?.representativeName}
+                              value={userData?.representativeName}
                             />
 
                             <ProfileInfoRow
                               icon={BriefcaseBusiness}
                               label="Role"
-                              value={profile?.role}
+                              value={userData?.role}
                             />
                           </div>
                         </div>
@@ -236,7 +203,7 @@ export default function ProfilePage() {
                               </p>
 
                               <p className="mt-1 text-sm">
-                                {profile?.communityDescription ||
+                                {userData?.communityDescription ||
                                   "No community description provided."}
                               </p>
                             </div>
@@ -260,25 +227,25 @@ export default function ProfilePage() {
                             <ProfileInfoRow
                               icon={Mail}
                               label="Email"
-                              value={profile?.email}
+                              value={userData?.email}
                             />
 
                             <ProfileInfoRow
                               icon={Phone}
                               label="Phone"
-                              value={profile?.phoneNumber}
+                              value={userData?.phoneNumber}
                             />
 
                             <ProfileInfoRow
                               icon={Globe}
                               label="Website"
-                              value={profile?.website}
+                              value={userData?.website}
                             />
 
                             <ProfileInfoRow
                               icon={MapPin}
                               label="Location"
-                              value={profile?.location}
+                              value={userData?.location}
                             />
                           </div>
                         </div>
@@ -301,22 +268,19 @@ export default function ProfilePage() {
               <TabsContent value="edit" className="mt-6 space-y-6">
                 <section className="grid gap-6 xl:grid-cols-2">
                   <CompanyInformationCard
-                    profile={profile}
-                    refresh={loadProfile}
+                    profile={userData}
                   />
 
                   <CommunityInformationCard
-                    profile={profile}
-                    refresh={loadProfile}
+                    profile={userData}
                   />
                 </section>
 
                 <ContactInformationCard
-                  profile={profile}
-                  refresh={loadProfile}
+                  profile={userData}
                 />
 
-                <LogoUploader profile={profile} refresh={loadProfile} />
+                <LogoUploader profile={userData} />
               </TabsContent>
 
               {/* ================================================= */}

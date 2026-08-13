@@ -2,16 +2,36 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Bell, ChevronDown, Menu, Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Bell,
+  ChevronDown,
+  Menu,
+  Search,
+  X,
+  User,
+  LogOut,
+} from "lucide-react";
+
+import Api from "@/utils/api";
+import { useUserStore } from "@/utils/user-store";
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export default function Header({ onMenuClick }: HeaderProps) {
+  const router = useRouter();
+
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const logoutUser = useUserStore((state) => state.logoutUser);
 
   useEffect(() => {
     if (isSearchExpanded && inputRef.current) {
@@ -19,16 +39,57 @@ export default function Header({ onMenuClick }: HeaderProps) {
     }
   }, [isSearchExpanded]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+      );
+    };
+  }, []);
+
   const handleBlur = () => {
     if (!searchQuery.trim()) {
       setIsSearchExpanded(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === "Escape") {
       setSearchQuery("");
       setIsSearchExpanded(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+
+    try {
+      setLoggingOut(true);
+
+      await Api.post("/partner/auth/logout");
+
+      setIsProfileOpen(false);
+
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoggingOut(false);
     }
   };
 
@@ -55,7 +116,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 ? "w-64 rounded-2xl px-3 sm:w-80 border-sky-500 ring-2 ring-sky-500/20"
                 : "w-11 justify-center rounded-full hover:bg-gray-100 cursor-pointer"
             }`}
-            onClick={() => !isSearchExpanded && setIsSearchExpanded(true)}
+            onClick={() =>
+              !isSearchExpanded &&
+              setIsSearchExpanded(true)
+            }
           >
             {/* Search Icon */}
             <button
@@ -63,6 +127,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               className="flex items-center justify-center text-gray-600 focus:outline-none"
               onClick={(e) => {
                 if (isSearchExpanded) return;
+
                 e.stopPropagation();
                 setIsSearchExpanded(true);
               }}
@@ -70,7 +135,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <Search className="h-5 w-5 shrink-0" />
             </button>
 
-            {/* Expanded Input Field & Clear Button */}
+            {/* Expanded Input Field */}
             {isSearchExpanded && (
               <>
                 <input
@@ -78,7 +143,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   type="text"
                   placeholder="Search anything..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) =>
+                    setSearchQuery(e.target.value)
+                  }
                   onBlur={handleBlur}
                   onKeyDown={handleKeyDown}
                   className="w-full bg-transparent pl-3 pr-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
@@ -110,17 +177,72 @@ export default function Header({ onMenuClick }: HeaderProps) {
             </span>
           </button> */}
 
-          {/* Avatar */}
-          <button className="flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1 pl-1 pr-3 transition hover:bg-gray-100">
-            <Image
-              src="https://i.pravatar.cc/100?img=12"
-              alt="Profile"
-              width={40}
-              height={40}
-              className="rounded-full object-cover"
-            />
-            <ChevronDown className="h-4 w-4 text-gray-500" />
-          </button>
+          {/* Profile Dropdown */}
+          <div
+            ref={profileRef}
+            className="relative"
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setIsProfileOpen((prev) => !prev)
+              }
+              className="flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1 pl-1 pr-3 transition hover:bg-gray-100"
+              aria-expanded={isProfileOpen}
+              aria-haspopup="menu"
+            >
+              <Image
+                src="https://i.pravatar.cc/100?img=12"
+                alt="Profile"
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+
+              <ChevronDown
+                className={`h-4 w-4 text-gray-500 transition-transform ${
+                  isProfileOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {isProfileOpen && (
+              <div
+                className="absolute right-0 mt-3 w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-lg"
+                role="menu"
+              >
+                {/* Profile */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    router.push("/dashboard/profile");
+                  }}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-700 transition hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  <User className="h-4 w-4 text-gray-500" />
+
+                  <span>Profile</span>
+                </button>
+
+                {/* Logout */}
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  disabled={loggingOut}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  role="menuitem"
+                >
+                  <LogOut className="h-4 w-4" />
+
+                  <span>
+                    {loggingOut ? "Logging out..." : "Logout"}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
