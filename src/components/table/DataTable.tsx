@@ -19,7 +19,7 @@ export default function DataTable<T extends Record<string, any>>({
   onSortChange,
 }: DataTableProps<T>) {
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="w-full overflow-hidden bg-white shadow-sm">
       {toolbar && <div className="border-b">{toolbar}</div>}
 
       <div className="max-h-[600px] w-full min-w-0 overflow-x-auto overflow-y-auto">

@@ -16,14 +16,16 @@ import BankSelectionStep from "./BankSelectionStep";
 import WithdrawAmountStep from "./WithdrawAmountStep";
 import WithdrawReviewStep from "./WithdrawReviewStep";
 
-interface WithdrawFundsModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
 export interface WithdrawFormValues {
   bankId: string;
   amount: number;
+}
+
+interface WithdrawFundsModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit?: (values: WithdrawFormValues) => Promise<void>;
+  availableBalance?: number;
 }
 
 const initialValues: WithdrawFormValues = {
@@ -34,12 +36,15 @@ const initialValues: WithdrawFormValues = {
 export default function WithdrawFundsModal({
   open,
   onOpenChange,
+  onSubmit,
+  availableBalance = 0,
 }: WithdrawFundsModalProps) {
   const [step, setStep] = useState(1);
 
   const [loading, setLoading] = useState(false);
 
-  const [values, setValues] = useState<WithdrawFormValues>(initialValues);
+  const [values, setValues] =
+    useState<WithdrawFormValues>(initialValues);
 
   const update = (value: Partial<WithdrawFormValues>) => {
     setValues((prev) => ({
@@ -48,36 +53,51 @@ export default function WithdrawFundsModal({
     }));
   };
 
-  const AVAILABLE_BALANCE = 24520;
-
   const canContinue =
     step === 1
       ? values.bankId !== ""
       : step === 2
-        ? values.amount > 0 && values.amount <= AVAILABLE_BALANCE
+        ? values.amount > 0 &&
+          values.amount <= availableBalance
         : true;
 
   const canWithdraw =
     values.bankId !== "" &&
     values.amount > 0 &&
-    values.amount <= AVAILABLE_BALANCE;
+    values.amount <= availableBalance;
 
   const handleWithdraw = async () => {
+    if (!canWithdraw) return;
+
     setLoading(true);
 
-    // await withdraw()
+    try {
+      if (onSubmit) {
+        await onSubmit(values);
+      }
 
-    setTimeout(() => {
-      setLoading(false);
       onOpenChange(false);
       setStep(1);
       setValues(initialValues);
-    }, 1500);
+    } catch (error) {
+      console.error("Withdrawal failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !loading) {
+      setStep(1);
+      setValues(initialValues);
+    }
+
+    onOpenChange(open);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-2xl">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Withdraw Funds</DialogTitle>
         </DialogHeader>
@@ -85,19 +105,30 @@ export default function WithdrawFundsModal({
         <WithdrawStepper currentStep={step} />
 
         <div className="max-h-[55vh] overflow-y-auto py-8">
-          {step === 1 && <BankSelectionStep value={values} onChange={update} />}
-
-          {step === 2 && (
-            <WithdrawAmountStep value={values} availableBalance={AVAILABLE_BALANCE} onChange={update} />
+          {step === 1 && (
+            <BankSelectionStep
+              value={values}
+              onChange={update}
+            />
           )}
 
-          {step === 3 && <WithdrawReviewStep values={values} />}
+          {step === 2 && (
+            <WithdrawAmountStep
+              value={values}
+              availableBalance={availableBalance}
+              onChange={update}
+            />
+          )}
+
+          {step === 3 && (
+            <WithdrawReviewStep values={values} />
+          )}
         </div>
 
         <div className="flex justify-between border-t pt-6">
           <Button
             variant="outline"
-            disabled={step === 1}
+            disabled={step === 1 || loading}
             onClick={() => setStep((s) => s - 1)}
           >
             Back
@@ -105,14 +136,19 @@ export default function WithdrawFundsModal({
 
           {step < 3 ? (
             <Button
-              disabled={!canContinue}
+              disabled={!canContinue || loading}
               onClick={() => setStep((s) => s + 1)}
             >
               Continue
             </Button>
           ) : (
-            <Button onClick={handleWithdraw} disabled={!canWithdraw || loading}>
-              {loading ? "Processing..." : "Confirm Withdrawal"}
+            <Button
+              onClick={handleWithdraw}
+              disabled={!canWithdraw || loading}
+            >
+              {loading
+                ? "Processing..."
+                : "Confirm Withdrawal"}
             </Button>
           )}
         </div>

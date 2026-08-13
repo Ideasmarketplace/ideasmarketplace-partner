@@ -1,16 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import DataTable from "@/components/table/DataTable";
 import DataTablePagination from "@/components/table/DataTablePagination";
 
-import { mockPayouts } from "./MockPayouts";
 import { payoutColumns } from "./PayoutColumns";
 import PayoutToolbar from "./PayoutToolbar";
 import { Payout } from "./types";
 
 interface PayoutTableProps {
+  data?: Payout[];
+  loading?: boolean;
+
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  pageSize?: number;
+
+  onPageChange?: (page: number) => void;
+
   onView?: (payout: Payout) => void;
   onEdit?: (payout: Payout) => void;
   onDelete?: (payout: Payout) => void;
@@ -18,36 +27,48 @@ interface PayoutTableProps {
 }
 
 export default function PayoutTable({
+  data = [],
+  loading = false,
+
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  pageSize = 10,
+
+  onPageChange,
+
   onView,
   onEdit,
   onDelete,
   onExport,
 }: PayoutTableProps) {
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
-  const pageSize = 10;
+  const filteredPayouts = data.filter((payout) => {
+    if (!search.trim()) return true;
 
-  const totalPages = Math.ceil(
-    mockPayouts.length / pageSize,
-  );
+    const searchValue = search.toLowerCase();
 
-  const payouts = useMemo(() => {
-    const start = (page - 1) * pageSize;
-
-    return mockPayouts.slice(start, start + pageSize);
-  }, [page]);
+    return (
+      payout.reference
+        ?.toLowerCase()
+        .includes(searchValue)
+    );
+  });
 
   return (
-    <div className="rounded-3xl border border-gray-100 bg-white shadow-sm">
+    <div className="space-y-0">
       <DataTable
         columns={payoutColumns({
           onView,
           onEdit,
           onDelete,
         })}
-        data={payouts}
+        data={filteredPayouts}
         toolbar={
           <PayoutToolbar
+            search={search}
+            onSearchChange={setSearch}
             onExport={onExport}
           />
         }
@@ -59,11 +80,11 @@ export default function PayoutTable({
 
       <div className="border-t border-gray-100 p-5">
         <DataTablePagination
-          currentPage={page}
+          currentPage={currentPage}
           totalPages={totalPages}
-          totalItems={mockPayouts.length}
+          totalItems={totalItems}
           pageSize={pageSize}
-          onPageChange={setPage}
+          onPageChange={onPageChange || (() => {})}
         />
       </div>
     </div>

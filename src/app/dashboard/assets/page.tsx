@@ -11,10 +11,6 @@ import {
   CreateFolderModal,
 } from "@/components/assets";
 
-import { Button } from "@/components/ui/button";
-
-import { FolderPlus, Upload } from "lucide-react";
-
 import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDialog";
 
 import AssetDetailsDrawer from "@/components/assets/AssetDetailsDrawer";

@@ -28,3 +28,10 @@ export interface BankAccount {
   currency: string;
   isDefault: boolean;
 }
+
+export interface PayoutSummary {
+  availableBalance: number;
+  pendingBalance: number;
+  totalPaidOut: number;
+  lastPayout: number;
+}

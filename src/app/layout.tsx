@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Sora, Zilla_Slab } from "next/font/google";
 import "./globals.css";
 import { twMerge } from "tailwind-merge";
-import { UserProvider } from "@/context/user-content";
 import { Toaster } from "sonner";
+import AuthProvider from "@/context/AuthContext";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={twMerge(zillaSlab.className, "antialiased")}>
-        <UserProvider>{children}</UserProvider>
+        <AuthProvider>{children}</AuthProvider>
         <Toaster richColors position="top-right" />
         {/* <Toaster /> */}
       </body>
