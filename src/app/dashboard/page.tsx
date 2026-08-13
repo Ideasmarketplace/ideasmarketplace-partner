@@ -178,7 +178,6 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const token = useUserStore((state) => state.token);
-  
 
   /* =========================================================
      Fetch Dashboard Overview
@@ -190,10 +189,10 @@ export default function DashboardPage() {
         setLoading(true);
         setError(null);
 
-        const response = await Api.get("partner/dashboard/overview", {
+        const response = await Api.get("partner/dashboard/overview", {});
 
-        });
-        
+        console.log("Dashboard overview:", response.data);
+
         if (response.data?.success) {
           setDashboard(response.data.data as DashboardData);
         } else {
@@ -309,22 +308,8 @@ export default function DashboardPage() {
      Error
   ========================================================= */
 
-  if (error || !dashboard) {
-    return (
-      <main className="flex-1">
-        <div className="flex min-h-[500px] items-center justify-center">
-          <div className="max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
-            <h2 className="text-xl font-semibold text-red-700">
-              Unable to load dashboard
-            </h2>
-
-            <p className="mt-2 text-sm text-red-600">
-              {error || "Dashboard information is currently unavailable."}
-            </p>
-          </div>
-        </div>
-      </main>
-    );
+  if (!dashboard) {
+    return <DashboardSkeleton />;
   }
 
   /* =========================================================
@@ -495,7 +480,6 @@ export default function DashboardPage() {
         ===================================================== */}
 
         <section className="grid grid-cols-12 gap-6">
-
           <div className="col-span-12 xl:col-span-7">
             <ActivityCard />
           </div>

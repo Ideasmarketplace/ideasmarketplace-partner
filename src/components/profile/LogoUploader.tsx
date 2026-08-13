@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 interface LogoUploaderProps {
   profile: any;
-  refresh: () => Promise<void>;
+  refresh?: () => Promise<void>;
 }
 
 export default function LogoUploader({
@@ -49,7 +49,6 @@ export default function LogoUploader({
 
       setPreview(data.logo);
 
-      await refresh();
     } catch (err) {
       console.error(err);
     } finally {
@@ -77,7 +76,6 @@ export default function LogoUploader({
 
       setPreview(null);
 
-      await refresh();
     } finally {
       setLoading(false);
     }

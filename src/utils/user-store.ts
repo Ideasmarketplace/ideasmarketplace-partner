@@ -10,6 +10,7 @@ export interface UserData {
   industry: string;
   representativeName: string;
   role: string;
+  photo: string;
   phoneNumber: string;
   communityDescription: string;
   communitySize: string;
@@ -106,7 +107,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
         isLoggingOut: false,
       });
 
-      window.location.href = "/login";
+      window.location.href = "/";
     } catch (err) {
       set({ isLoggingOut: false });
     }

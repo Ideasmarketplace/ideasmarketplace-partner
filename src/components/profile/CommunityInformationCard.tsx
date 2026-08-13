@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 
 interface CommunityInformationCardProps {
   profile: any;
-  refresh: () => Promise<void>;
+  refresh?: () => Promise<void>;
 }
 
 export default function CommunityInformationCard({
@@ -48,7 +48,6 @@ export default function CommunityInformationCard({
 
       await Api.put("/partner/profile", form);
 
-      await refresh();
     } catch (error) {
       console.error(error);
     } finally {
@@ -58,7 +57,7 @@ export default function CommunityInformationCard({
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex flex-col gap-4 border-b p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex p-6 flex-col md:flex-row items-start gap-4 md:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-indigo-50 p-3">
             <Users className="h-6 w-6 text-indigo-600" />

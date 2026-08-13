@@ -17,7 +17,7 @@ export default function AuthProvider({
   useEffect(() => {
     const init = async () => {
       try {
-        const res = await Api.get("partner/session", {
+        const res = await Api.get("partner/auth/session", {
           withCredentials: true,
         });
         if (res.data?.user) {
