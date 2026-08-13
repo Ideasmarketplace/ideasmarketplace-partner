@@ -14,7 +14,7 @@ import CommunityCard from "@/components/dashboard/CommunityCard";
 import HeroIllustration from "@/components/HeroIllustration";
 
 import Api from "@/utils/api";
-import { useUser } from "@/hooks/use-user";
+import { useUserStore } from "@/utils/user-store";
 
 /* =========================================================
    Types
@@ -177,7 +177,8 @@ export default function DashboardPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const { userData } = useUser();
+  const token = useUserStore((state) => state.token);
+  
 
   /* =========================================================
      Fetch Dashboard Overview
@@ -189,10 +190,10 @@ export default function DashboardPage() {
         setLoading(true);
         setError(null);
 
-        const response = await Api.get("partner/dashboard/overview");
+        const response = await Api.get("partner/dashboard/overview", {
 
-        console.log("Dashboard overview:", response.data);
-
+        });
+        
         if (response.data?.success) {
           setDashboard(response.data.data as DashboardData);
         } else {
@@ -385,11 +386,11 @@ export default function DashboardPage() {
 
               <div ref={buttonsRef} className="mt-8 flex flex-wrap gap-4">
                 <button className="rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white transition hover:bg-indigo-700">
-                  My Assets
+                  View Earnings
                 </button>
 
                 <button className="rounded-xl border border-sky-200 bg-white px-6 py-3 font-medium text-sky-700 transition hover:bg-sky-50">
-                  View Reports
+                  Generate Reports
                 </button>
               </div>
             </div>

@@ -2,7 +2,6 @@
 
 import { HOME } from "@/constants/path";
 import { toast } from "@/hooks/use-toast";
-import { useUser } from "@/hooks/use-user";
 import Api from "@/utils/api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -19,6 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useUserStore } from "@/utils/user-store";
+import { csrfStore } from "@/utils/global-state-store";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,31 +27,49 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const [_, setCookie] = useCookies(["access_token"]);
-  const { login } = useUser();
+  const login = useUserStore((state) => state.login);
 
   const handleLogin = async () => {
     try {
       setIsLoading(true);
-      const payload = { email, password };
-      const response = await Api.post("auth/partner/login", payload);
+
+      const payload = {
+        email,
+        password,
+      };
+
+      const response = await Api.post("partner/auth/login", payload);
+
       if (response.status === 200) {
-        setIsLoading(false);
-        const { accessToken, ...userData } = response.data;
-        setCookie("access_token", accessToken, {
-          path: "/",
-          maxAge: 3600,
-          sameSite: "none",
-        });
-        login(userData, accessToken);
-        router.push(HOME);
+        const { accessToken, partner, csrfToken } = response.data.data;
+
+        if (csrfToken) {
+          csrfStore.setToken(csrfToken);
+        }
+
+        login(partner, accessToken);
+
+        Api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+        const previousRoute = sessionStorage.getItem("previousRoute");
+
+        if (previousRoute) {
+          router.push(previousRoute);
+          sessionStorage.removeItem("previousRoute");
+        } else {
+          router.push(HOME);
+        }
       }
     } catch (error: any) {
+      console.log(error);
+
       setIsLoading(false);
 
       toast({
         title: "Login failed",
-        description: error?.response?.data,
+        description:
+          error?.response?.data?.message ||
+          "Unable to login. Please check your credentials.",
         variant: "destructive",
       });
     }
@@ -91,12 +110,12 @@ const Login = () => {
           </div>
 
           {/* Login Card */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
-            <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-2xl font-semibold text-white text-center">
+          <Card className="bg-white backdrop-blur-md border-white/20 shadow-2xl">
+            <CardHeader className="py-5 flex flex-col">
+              <CardTitle className="text-2xl font-semibold text-center">
                 Sign In
               </CardTitle>
-              <CardDescription className="text-white/70 text-center">
+              <CardDescription className="text-center">
                 Enter your credentials to access your account
               </CardDescription>
             </CardHeader>
@@ -104,36 +123,36 @@ const Login = () => {
             <CardContent className="space-y-4">
               <form className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white/90">
+                  <Label htmlFor="email" className="">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                      className="pl-10 py-5"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-white/90">
+                  <Label htmlFor="password" className="">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10 bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                      className="pl-10 pr-10 py-5"
                       required
                     />
                     <button

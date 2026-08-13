@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useEffect, useState } from "react";
+
+import Api from "@/utils/api";
+
 import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDialog";
 
 import {
@@ -11,6 +13,8 @@ import {
   MemberDetailsDrawer,
   InviteMemberModal,
 } from "@/components/network-members";
+
+import type { NetworkMetrics } from "@/components/network-members/NetworkMetricCards";
 
 export default function NetworkMembersPage() {
   const [selectedMember, setSelectedMember] = useState<NetworkMember | null>(
@@ -23,82 +27,114 @@ export default function NetworkMembersPage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  const [metrics, setMetrics] = useState<NetworkMetrics | null>(null);
+
+  const [metricsLoading, setMetricsLoading] = useState(true);
+
+  /**
+   * Fetch network metrics
+   */
+  useEffect(() => {
+    const fetchNetworkMetrics = async () => {
+      try {
+        setMetricsLoading(true);
+
+        const response = await Api.get("partner/network-members/metrics");
+
+        if (response.data?.success) {
+          setMetrics(response.data.data || null);
+        } else {
+          setMetrics(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch network metrics:", error);
+
+        setMetrics(null);
+      } finally {
+        setMetricsLoading(false);
+      }
+    };
+
+    fetchNetworkMetrics();
+  }, []);
+
   return (
-    <div className="min-h-screen">
-      <div className="flex">
-        {/* Main Content */}
-        <main className="min-w-0 flex-1">
-          <div className="space-y-6">
-            {/* Header */}
-            <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h1 className="text-4xl font-bold tracking-tight">
-                  Network Members
-                </h1>
+    <main className="min-h-screen flex-1">
+      <div className="space-y-6">
+        {/* Header */}
+        <section className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight">Network Members</h1>
 
-                <p className="mt-2 text-muted-foreground">
-                  Manage your team, collaborators and invited members.
-                </p>
-              </div>
-            </section>
+          <p className="mt-2 text-muted-foreground">
+            Manage your team, collaborators and invited members.
+          </p>
+        </section>
 
-            <NetworkMetricCards />
+        {/* Metrics */}
+        <NetworkMetricCards data={metrics} loading={metricsLoading} />
 
-            <NetworkTable
-              onInvite={() => setInviteOpen(true)}
-              onView={(member) => {
-                setSelectedMember(member);
-                setDrawerOpen(true);
-              }}
-              onEdit={(member) => {
-                setSelectedMember(member);
-                setDrawerOpen(true);
-              }}
-              onDelete={(member) => {
-                setSelectedMember(member);
-                setDeleteOpen(true);
-              }}
-            />
+        {/* Members Table */}
+        <NetworkTable
+          onInvite={() => setInviteOpen(true)}
+          onView={(member) => {
+            setSelectedMember(member);
+            setDrawerOpen(true);
+          }}
+          onEdit={(member) => {
+            setSelectedMember(member);
+            setDrawerOpen(true);
+          }}
+          onDelete={(member) => {
+            setSelectedMember(member);
+            setDeleteOpen(true);
+          }}
+        />
 
-            <MemberDetailsDrawer
-              open={drawerOpen}
-              onOpenChange={setDrawerOpen}
-              member={selectedMember}
-              onEdit={(member) => {
-                setSelectedMember(member);
-                setInviteOpen(true);
-              }}
-              onDelete={(member) => {
-                setSelectedMember(member);
-                setDeleteOpen(true);
-              }}
-            />
+        {/* Member Details */}
+        <MemberDetailsDrawer
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          member={selectedMember}
+          onEdit={(member) => {
+            setSelectedMember(member);
+            setDrawerOpen(false);
+            setInviteOpen(true);
+          }}
+          onDelete={(member) => {
+            setSelectedMember(member);
+            setDrawerOpen(false);
+            setDeleteOpen(true);
+          }}
+        />
 
-            <InviteMemberModal open={inviteOpen} onOpenChange={setInviteOpen} />
+        {/* Invite Member */}
+        <InviteMemberModal open={inviteOpen} onOpenChange={setInviteOpen} />
 
-            <DeleteConfirmationDialog
-              open={deleteOpen}
-              onOpenChange={setDeleteOpen}
-              title="Remove Member"
-              description="Are you sure you want to remove this member from your network?"
-              itemName={
-                selectedMember
-                  ? `${selectedMember.firstName} ${selectedMember.lastName}`
-                  : undefined
-              }
-              onConfirm={async () => {
-                if (!selectedMember) return;
+        {/* Delete */}
+        <DeleteConfirmationDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          title="Remove Member"
+          description="Are you sure you want to remove this member from your network?"
+          itemName={
+            selectedMember
+              ? `${selectedMember.firstName} ${selectedMember.lastName}`
+              : undefined
+          }
+          onConfirm={async () => {
+            if (!selectedMember) return;
 
-                // await removeMember(selectedMember.id)
+            /*
+             * No remove-member endpoint has been
+             * provided yet.
+             */
 
-                setDeleteOpen(false);
-                setDrawerOpen(false);
-                setSelectedMember(null);
-              }}
-            />
-          </div>
-        </main>
+            setDeleteOpen(false);
+            setDrawerOpen(false);
+            setSelectedMember(null);
+          }}
+        />
       </div>
-    </div>
+    </main>
   );
 }

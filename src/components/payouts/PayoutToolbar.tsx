@@ -11,18 +11,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface PayoutToolbarProps {
+  search: string;
+  onSearchChange: (value: string) => void;
   onExport?: () => void;
 }
 
 export default function PayoutToolbar({
+  search,
+  onSearchChange,
   onExport,
 }: PayoutToolbarProps) {
   return (
-    <div className="flex flex-col gap-4 border-b bg-white p-5 lg:flex-row lg:items-center lg:justify-between">
-      <div className="relative w-full max-w-md">
+    <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+      <div className="relative w-full md:max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
         <Input
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search payouts..."
           className="pl-10"
         />
@@ -39,7 +45,10 @@ export default function PayoutToolbar({
           Sort
         </Button>
 
-        <Button onClick={onExport} className="bg-indigo-600">
+        <Button
+          onClick={onExport}
+          className="bg-indigo-600"
+        >
           <Download className="mr-2 h-4 w-4" />
           Export
         </Button>

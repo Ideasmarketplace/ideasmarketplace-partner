@@ -1,23 +1,31 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import DataTable from "@/components/table/DataTable";
 import DataTablePagination from "@/components/table/DataTablePagination";
-
 import NetworkToolbar from "./NetworkToolbar";
-
 import { networkColumns } from "./NetworkColumns";
-
-import { mockMembers } from "./MockMembers";
 import { NetworkMember } from "./types";
+
+import Api from "@/utils/api";
 
 interface NetworkTableProps {
   onInvite: () => void;
-
   onView?: (member: NetworkMember) => void;
   onEdit?: (member: NetworkMember) => void;
   onDelete?: (member: NetworkMember) => void;
+}
+
+interface MembersResponse {
+  success: boolean;
+  members: NetworkMember[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
 export default function NetworkTable({
@@ -26,72 +34,98 @@ export default function NetworkTable({
   onEdit,
   onDelete,
 }: NetworkTableProps) {
+  const [members, setMembers] = useState<NetworkMember[]>([]);
   const [page, setPage] = useState(1);
-
   const [search, setSearch] = useState("");
-
-  const [role, setRole] = useState("all");
-
   const [status, setStatus] = useState("all");
+
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const [loading, setLoading] = useState(false);
 
   const pageSize = 10;
 
-  const filteredMembers = useMemo(() => {
-    return mockMembers.filter((member) => {
-      const matchesSearch =
-        `${member.firstName} ${member.lastName}`
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        member.email
-          .toLowerCase()
-          .includes(search.toLowerCase());
+  useEffect(() => {
+    const fetchNetworkMembers = async () => {
+      setLoading(true);
 
-      const matchesRole =
-        role === "all" ||
-        member.role === role;
+      try {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(pageSize),
+        });
 
-      const matchesStatus =
-        status === "all" ||
-        member.status === status;
+        if (search.trim()) {
+          params.append("search", search.trim());
+        }
 
-      return (
-        matchesSearch &&
-        matchesRole &&
-        matchesStatus
-      );
-    });
-  }, [search, role, status]);
+        if (status !== "all") {
+          params.append("status", status);
+        }
 
-  const totalPages = Math.ceil(
-    filteredMembers.length / pageSize
-  );
+        const response = await Api.get<MembersResponse>(
+          `/partner/members?${params.toString()}`
+        );
 
-  const paginatedMembers = useMemo(() => {
-    const start = (page - 1) * pageSize;
+        if (response.data?.success) {
+          setMembers(response.data.members || []);
 
-    return filteredMembers.slice(
-      start,
-      start + pageSize
-    );
-  }, [filteredMembers, page]);
+          setTotalItems(
+            response.data.pagination?.total || 0
+          );
+
+          setTotalPages(
+            response.data.pagination?.pages || 1
+          );
+        } else {
+          setMembers([]);
+          setTotalItems(0);
+          setTotalPages(1);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to fetch network members:",
+          error
+        );
+
+        setMembers([]);
+        setTotalItems(0);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNetworkMembers();
+  }, [page, search, status]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    setPage(1);
+  };
 
   return (
-    <div className="rounded-3xl border border-gray-100 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
       <DataTable
         columns={networkColumns({
           onView,
           onEdit,
           onDelete,
         })}
-        data={paginatedMembers}
+        data={members}
+        loading={loading}
         toolbar={
           <NetworkToolbar
             search={search}
-            onSearchChange={setSearch}
-            role={role}
-            onRoleChange={setRole}
+            onSearchChange={handleSearchChange}
             status={status}
-            onStatusChange={setStatus}
+            onStatusChange={handleStatusChange}
             onInvite={onInvite}
           />
         }
@@ -105,7 +139,7 @@ export default function NetworkTable({
         <DataTablePagination
           currentPage={page}
           totalPages={totalPages}
-          totalItems={filteredMembers.length}
+          totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setPage}
         />
