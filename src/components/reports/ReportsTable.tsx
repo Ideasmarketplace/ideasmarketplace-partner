@@ -13,8 +13,6 @@ import { Report } from "./types";
 interface ReportsTableProps {
   onCreateReport: () => void;
 
-  onExport?: () => void;
-
   onView?: (report: Report) => void;
 
   onEdit?: (report: Report) => void;
@@ -26,7 +24,6 @@ interface ReportsTableProps {
 
 export default function ReportsTable({
   onCreateReport,
-  onExport,
   onView,
   onEdit,
   onPublish,
@@ -54,29 +51,39 @@ export default function ReportsTable({
         (report) =>
           report.title.toLowerCase().includes(value) ||
           report.author.toLowerCase().includes(value) ||
-          report.category.toLowerCase().includes(value)
+          report.category.toLowerCase().includes(value),
       );
     }
 
     if (status !== "all") {
-      reports = reports.filter((report) => report.status === status);
+      reports = reports.filter(
+        (report) => report.status === status,
+      );
     }
 
     if (category !== "all") {
-      reports = reports.filter((report) => report.category === category);
+      reports = reports.filter(
+        (report) => report.category === category,
+      );
     }
 
     switch (sort) {
       case "title":
-        reports.sort((a, b) => a.title.localeCompare(b.title));
+        reports.sort((a, b) =>
+          a.title.localeCompare(b.title),
+        );
         break;
 
       case "downloads":
-        reports.sort((a, b) => b.downloads - a.downloads);
+        reports.sort(
+          (a, b) => b.downloads - a.downloads,
+        );
         break;
 
       case "views":
-        reports.sort((a, b) => b.views - a.views);
+        reports.sort(
+          (a, b) => b.views - a.views,
+        );
         break;
 
       case "oldest":
@@ -90,12 +97,17 @@ export default function ReportsTable({
     return reports;
   }, [search, status, category, sort]);
 
-  const totalPages = Math.ceil(filteredReports.length / pageSize);
+  const totalPages = Math.ceil(
+    filteredReports.length / pageSize,
+  );
 
   const paginatedReports = useMemo(() => {
     const start = (page - 1) * pageSize;
 
-    return filteredReports.slice(start, start + pageSize);
+    return filteredReports.slice(
+      start,
+      start + pageSize,
+    );
   }, [filteredReports, page]);
 
   const columns = useMemo(
@@ -106,7 +118,7 @@ export default function ReportsTable({
         onPublish,
         onDelete,
       }),
-    [onView, onEdit, onPublish, onDelete]
+    [onView, onEdit, onPublish, onDelete],
   );
 
   return (
@@ -117,7 +129,6 @@ export default function ReportsTable({
         toolbar={
           <ReportsToolbar
             onCreateReport={onCreateReport}
-            onExport={onExport}
             onSearch={(value) => {
               setSearch(value);
               setPage(1);
@@ -130,7 +141,10 @@ export default function ReportsTable({
               setCategory(value);
               setPage(1);
             }}
-            onSortChange={setSort}
+            onSortChange={(value) => {
+              setSort(value);
+              setPage(1);
+            }}
           />
         }
         stickyHeader

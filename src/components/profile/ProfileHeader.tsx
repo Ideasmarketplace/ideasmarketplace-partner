@@ -16,12 +16,8 @@ export default function ProfileHeader({
   const approved = status === "approved";
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex items-start gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
-          <Building2 className="h-8 w-8 text-indigo-600" />
-        </div>
-
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             Profile
@@ -55,15 +51,10 @@ export default function ProfileHeader({
 
       <div className="flex justify-start lg:justify-end">
         <div
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
-            approved
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-amber-50 text-amber-700"
-          }`}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium bg-emerald-50 text-emerald-700`}
         >
           <BadgeCheck className="h-4 w-4" />
-
-          {approved ? "Approved Partner" : "Pending Approval"}
+          Verified
         </div>
       </div>
     </div>
