@@ -33,3 +33,10 @@ export interface GenerateReportValues {
   compressImages: boolean;
   includeBranding: boolean;
 }
+
+export interface ReportsSummary {
+  totalReports: number;
+  published: number;
+  downloads: number;
+  scheduled: number;
+}

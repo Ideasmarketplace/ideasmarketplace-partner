@@ -6,47 +6,51 @@ import {
   Download,
   Clock3,
 } from "lucide-react";
+import { ReportsSummary } from "./types";
 
-interface MetricCard {
-  title: string;
-  value: string;
-  change: string;
-  icon: React.ReactNode;
-  iconBg: string;
+interface ReportsMetricCardsProps {
+  data?: ReportsSummary | null;
 }
 
-const metrics: MetricCard[] = [
-  {
-    title: "Total Reports",
-    value: "248",
-    change: "+18 this month",
-    icon: <FileText className="h-6 w-6 text-indigo-600" />,
-    iconBg: "bg-indigo-100",
-  },
-  {
-    title: "Published",
-    value: "192",
-    change: "77% published",
-    icon: <Eye className="h-6 w-6 text-emerald-600" />,
-    iconBg: "bg-emerald-100",
-  },
-  {
-    title: "Downloads",
-    value: "18.4K",
-    change: "+12.6%",
-    icon: <Download className="h-6 w-6 text-blue-600" />,
-    iconBg: "bg-blue-100",
-  },
-  {
-    title: "Scheduled",
-    value: "14",
-    change: "Upcoming releases",
-    icon: <Clock3 className="h-6 w-6 text-orange-600" />,
-    iconBg: "bg-orange-100",
-  },
-];
+export default function ReportsMetricCards({
+  data,
+}: ReportsMetricCardsProps) {
+  const metrics = [
+    {
+      title: "Total Reports",
+      value: (data?.totalReports ?? 0).toLocaleString(),
+      change: "Total generated reports",
+      icon: <FileText className="h-6 w-6 text-indigo-600" />,
+      iconBg: "bg-indigo-100",
+    },
+    {
+      title: "Published",
+      value: (data?.published ?? 0).toLocaleString(),
+      change:
+        data?.totalReports
+          ? `${Math.round(
+              (data.published / data.totalReports) * 100,
+            )}% published`
+          : "0% published",
+      icon: <Eye className="h-6 w-6 text-emerald-600" />,
+      iconBg: "bg-emerald-100",
+    },
+    {
+      title: "Downloads",
+      value: (data?.downloads ?? 0).toLocaleString(),
+      change: "Total downloads",
+      icon: <Download className="h-6 w-6 text-blue-600" />,
+      iconBg: "bg-blue-100",
+    },
+    {
+      title: "Scheduled",
+      value: (data?.scheduled ?? 0).toLocaleString(),
+      change: "Upcoming releases",
+      icon: <Clock3 className="h-6 w-6 text-orange-600" />,
+      iconBg: "bg-orange-100",
+    },
+  ];
 
-export default function ReportsMetricCards() {
   return (
     <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
