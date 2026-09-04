@@ -8,6 +8,7 @@ import Api from "@/utils/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
 
 export default function ChangePasswordCard() {
   const [loading, setLoading] = useState(false);
@@ -54,10 +55,10 @@ export default function ChangePasswordCard() {
         confirmPassword: "",
       });
 
-      alert("Password updated successfully.");
+      toast({title:"Password updated successfully."});
     } catch (error) {
       console.error(error);
-      alert("Unable to update password.");
+      toast({ title: "Unable to update password.", variant: "destructive"});
     } finally {
       setLoading(false);
     }

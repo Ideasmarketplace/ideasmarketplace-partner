@@ -73,7 +73,7 @@ export default function RevenueMetricCards({
     {
       title: "Total Revenue",
       value: formatCurrency(data?.totalRevenue),
-      change: "+18.2%",
+      change: "+0%",
       description: "Lifetime revenue",
       icon: DollarSign,
       color: "bg-emerald-100 text-emerald-600",
@@ -82,7 +82,7 @@ export default function RevenueMetricCards({
     {
       title: "This Month",
       value: formatCurrency(data?.monthlyRevenue),
-      change: "+9.6%",
+      change: "+0%",
       description: "Compared to last month",
       icon: TrendingUp,
       color: "bg-indigo-100 text-indigo-600",
@@ -91,7 +91,7 @@ export default function RevenueMetricCards({
     {
       title: "Pending Revenue",
       value: formatCurrency(data?.pendingRevenue),
-      change: "+4.3%",
+      change: "+0%",
       description: `${data?.pendingTransactions ?? 0} transactions`,
       icon: Clock3,
       color: "bg-amber-100 text-amber-600",
@@ -100,7 +100,7 @@ export default function RevenueMetricCards({
     {
       title: "Average Monthly",
       value: formatCurrency(data?.averageRevenue),
-      change: "+12.5%",
+      change: "+0%",
       description: "Last 12 months",
       icon: Wallet,
       color: "bg-sky-100 text-sky-600",

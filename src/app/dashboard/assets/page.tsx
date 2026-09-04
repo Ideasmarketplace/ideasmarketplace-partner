@@ -236,7 +236,7 @@ export default function AssetsPage() {
         return;
       }
 
-      await Api.patch(`/partner/assets/${asset.type}/${asset.id}/status`, {
+      await Api.patch(`partner/assets/${asset.type}/${asset.id}/status`, {
         status,
       });
 
@@ -255,7 +255,7 @@ export default function AssetsPage() {
         <section className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              My Assets
+              My Personal Assets
             </h1>
 
             <p className="mt-2 text-gray-500">

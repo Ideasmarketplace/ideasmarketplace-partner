@@ -358,6 +358,7 @@ export default function DashboardPage() {
                 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
               >
                 Welcome, {dashboard.partner?.companyName || "Partner"}
+                {/* Welcome, Glory */}
               </h1>
 
               <p

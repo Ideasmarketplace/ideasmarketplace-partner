@@ -31,6 +31,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
+  const userData = useUserStore((state) => state.userData);
   const logoutUser = useUserStore((state) => state.logoutUser);
 
   useEffect(() => {
@@ -141,7 +142,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Search anything..."
+                  placeholder="Search assets, network members..."
                   value={searchQuery}
                   onChange={(e) =>
                     setSearchQuery(e.target.value)
