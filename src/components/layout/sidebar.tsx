@@ -20,16 +20,27 @@ import {
 import Image from "next/image";
 import Logo from "@/assets/logo.png";
 import { useEffect } from "react";
+import { useUserStore } from "@/utils/user-store";
 
 const menuItems = [
   {
-    title: "Dashboard",
+    title: "Home",
     href: "/dashboard",
     icon: LayoutDashboard,
   },
   {
-    title: "My Assets",
+    title: "My Personal Assets",
     href: "/dashboard/assets",
+    icon: FolderOpen,
+  },
+  {
+    title: "Network Members",
+    href: "/dashboard/network-members",
+    icon: Users,
+  },
+  {
+    title: "Network Assets",
+    href: "/dashboard/network-assets",
     icon: FolderOpen,
   },
   {
@@ -42,11 +53,6 @@ const menuItems = [
   //   href: "/dashboard/referrals",
   //   icon: UserPlus,
   // },
-  {
-    title: "Network Members",
-    href: "/dashboard/network-members",
-    icon: Users,
-  },
   {
     title: "Reports",
     href: "/dashboard/reports",
@@ -83,6 +89,7 @@ interface SidebarProps {
 export default function Sidebar({ open = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
 
   useEffect(() => {
     if (open) {
@@ -188,7 +195,7 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
             />
 
             <div className="flex-1 text-left">
-              <h4 className="font-semibold">Glory James</h4>
+              <h4 className="font-semibold">{userData?.companyName}</h4>
 
               <p className="text-sm text-gray-500">
                 Creator + Community Leader

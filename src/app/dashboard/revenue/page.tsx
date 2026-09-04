@@ -123,7 +123,7 @@ export default function RevenuePage() {
 
       <section>
         <h1 className="text-4xl font-bold tracking-tight">
-          Sales and Earnings
+          Financials - Sales and Earnings
         </h1>
 
         <p className="mt-2 text-muted-foreground">

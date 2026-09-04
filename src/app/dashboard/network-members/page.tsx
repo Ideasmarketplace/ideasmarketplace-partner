@@ -63,7 +63,7 @@ export default function NetworkMembersPage() {
       <div className="space-y-6">
         {/* Header */}
         <section className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Network Members</h1>
+          <h1 className="text-4xl font-bold tracking-tight">My Network Members</h1>
 
           <p className="mt-2 text-muted-foreground">
             Manage your team, collaborators and invited members.
