@@ -1,14 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Copy,
-  Share2,
-  Facebook,
-  Linkedin,
-  Twitter,
-  Check,
-} from "lucide-react";
+import { Copy, Share2, Facebook, Linkedin, Twitter, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,9 +15,9 @@ export default function ReferralCard({
   totalMembers = 0,
 }: ReferralCardProps) {
   const [copied, setCopied] = useState(false);
-
+  const encodedReferralCode = encodeURIComponent(referralCode || "");
   const referralLink = referralCode
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/${referralCode}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/signup?refcode=${encodedReferralCode}`
     : "";
 
   async function copyLink() {
@@ -53,19 +46,17 @@ export default function ReferralCard({
       return;
     }
 
-    const text = encodeURIComponent(
-      "Join my community on Ideas Marketplace."
-    );
+    const text = encodeURIComponent("Join my community on Ideas Marketplace.");
 
     const urls: Record<string, string> = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        referralLink
+        referralLink,
       )}`,
       twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-        referralLink
+        referralLink,
       )}&text=${text}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-        referralLink
+        referralLink,
       )}`,
     };
 
@@ -88,7 +79,7 @@ export default function ReferralCard({
     window.open(
       urls[platform],
       "_blank",
-      "noopener,noreferrer,width=600,height=500"
+      "noopener,noreferrer,width=600,height=500",
     );
   };
 
@@ -104,13 +95,11 @@ export default function ReferralCard({
           Earn 5%
         </span>
 
-        <h2 className="mt-4 text-2xl font-bold">
-          Grow your network
-        </h2>
+        <h2 className="mt-4 text-2xl font-bold">Grow your network</h2>
 
         <p className="mt-3 text-sm leading-7 text-indigo-100">
-          Invite creators to join your community and earn a commission
-          whenever they complete a sale.
+          Invite creators to join your community and earn a commission whenever
+          they complete a sale.
         </p>
       </div>
 
@@ -152,9 +141,7 @@ export default function ReferralCard({
 
       {/* Share */}
       <div className="mt-8">
-        <p className="mb-3 text-sm text-indigo-100">
-          Share on
-        </p>
+        <p className="mb-3 text-sm text-indigo-100">Share on</p>
 
         <div className="flex gap-3">
           <button
