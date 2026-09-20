@@ -17,15 +17,14 @@ export default function MemberMetadata({ member }: MemberMetadataProps) {
 
       <MetadataRow label="Status" value={<StatusBadge status={member.status} />} />
 
-      <MetadataRow label="Joined" value={member.joinedAt} />
+      <MetadataRow label="Joined" value={member.createdAt} />
 
-      <MetadataRow label="Last Active" value={member.lastActive} />
 
-      <MetadataRow label="Assets Managed" value={member.assetsManaged} />
+      <MetadataRow label="Assets Managed" value={member.totalAssets} />
 
       <MetadataRow
         label="Revenue Generated"
-        value={`$${member.revenueGenerated.toLocaleString()}`}
+        value={`$${member.totalRevenue.toLocaleString()}`}
       />
 
       <MetadataRow label="Phone" value={member.phone ?? "-"} />
