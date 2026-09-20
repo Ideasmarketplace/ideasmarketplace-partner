@@ -29,7 +29,10 @@ export const networkColumns = ({
     cell: (row) => (
       <div className="flex items-center gap-4">
         <Image
-          src={row.avatar}
+          src={
+            row.photo ||
+            "https://ui-avatars.com/api/?name=User&background=random"
+          }
           alt={`${row.firstName} ${row.lastName}`}
           width={48}
           height={48}
@@ -47,12 +50,12 @@ export const networkColumns = ({
     ),
   },
 
-//   {
-//     id: "role",
-//     header: "Role",
+  //   {
+  //     id: "role",
+  //     header: "Role",
 
-//     cell: (row) => <span className="font-medium">{row.role}</span>,
-//   },
+  //     cell: (row) => <span className="font-medium">{row.role}</span>,
+  //   },
 
   {
     id: "status",
@@ -61,23 +64,43 @@ export const networkColumns = ({
   },
 
   {
-    id: "assetsManaged",
+    id: "totalAssets",
     header: "Assets",
 
-    cell: (row) => row.assetsManaged,
+    cell: (row) => row.totalAssets,
   },
 
   {
-    id: "revenueGenerated",
+    id: "totalRevenue",
     header: "Revenue",
 
-    cell: (row) => `$${row.revenueGenerated.toLocaleString()}`,
+    cell: (row) => `${row?.totalRevenue?.toLocaleString()}`,
   },
 
   {
-    id: "lastActive",
-    header: "Last Active",
-    accessorKey: "lastActive",
+    id: "createdAt",
+    header: "Joined",
+    cell: (row) => {
+      if (!row?.createdAt) return "—";
+
+      const date = new Date(row.createdAt);
+
+      const formattedDate = date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const formattedTime = date
+        .toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })
+        .replace(":", ".");
+
+      return `${formattedDate} ${formattedTime}`;
+    },
   },
 
   {

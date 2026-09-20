@@ -16,8 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export interface NetworkMetrics {
   totalMembers: number;
-  activeMembers: number;
-  pendingMembers: number;
+  verifiedMembers: number;
+  inactiveMembers: number;
   totalRevenue: number;
 }
 
@@ -42,8 +42,8 @@ const metricsConfig = [
     iconColor: "text-emerald-600",
   },
   {
-    title: "Pending Invites",
-    subtitle: "Awaiting acceptance",
+    title: "Pending Members",
+    subtitle: "Awaiting verification",
     icon: UserPlus,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
@@ -88,8 +88,8 @@ export default function NetworkMetricCards({
   }
 
   const totalMembers = data?.totalMembers ?? 0;
-  const activeMembers = data?.activeMembers ?? 0;
-  const pendingMembers = data?.pendingMembers ?? 0;
+  const activeMembers = data?.verifiedMembers ?? 0;
+  const pendingMembers = data?.inactiveMembers ?? 0;
   const totalRevenue = data?.totalRevenue ?? 0;
 
   const activePercentage =

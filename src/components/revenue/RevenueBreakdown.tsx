@@ -1,19 +1,8 @@
 "use client";
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -52,10 +41,7 @@ function RevenueBreakdownSkeleton() {
       {/* Breakdown */}
       <div className="space-y-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between"
-          >
+          <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-3 w-3 rounded-full bg-gray-200" />
 
@@ -87,19 +73,14 @@ export default function RevenueBreakdown({
   data = [],
   loading = false,
 }: RevenueBreakdownProps) {
-  const totalRevenue = data.reduce(
-    (sum, item) => sum + (item.amount || 0),
-    0,
-  );
+  const totalRevenue = data.reduce((sum, item) => sum + (item.amount || 0), 0);
 
   return (
     <Card className="rounded-3xl">
       <CardHeader>
         <CardTitle>Revenue Breakdown</CardTitle>
 
-        <p className="text-sm text-muted-foreground">
-          Revenue by source
-        </p>
+        <p className="text-sm text-muted-foreground">Revenue by source</p>
       </CardHeader>
 
       <CardContent>
@@ -115,10 +96,7 @@ export default function RevenueBreakdown({
           <>
             {/* Chart */}
             <div className="h-64">
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-              >
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={data}
@@ -131,9 +109,7 @@ export default function RevenueBreakdown({
                     {data.map((item, index) => (
                       <Cell
                         key={`${item.source}-${index}`}
-                        fill={
-                          COLORS[index % COLORS.length]
-                        }
+                        fill={COLORS[index % COLORS.length]}
                       />
                     ))}
                   </Pie>
@@ -159,14 +135,11 @@ export default function RevenueBreakdown({
                     <span
                       className="h-3 w-3 rounded-full"
                       style={{
-                        backgroundColor:
-                          COLORS[index % COLORS.length],
+                        backgroundColor: COLORS[index % COLORS.length],
                       }}
                     />
 
-                    <span className="text-sm font-medium">
-                      {item.source}
-                    </span>
+                    <span className="text-sm font-medium">{item.source}</span>
                   </div>
 
                   <div className="text-right">
@@ -185,9 +158,7 @@ export default function RevenueBreakdown({
             {/* Total */}
             <div className="mt-6 border-t pt-6">
               <div className="flex items-center justify-between">
-                <span className="font-medium">
-                  Total Revenue
-                </span>
+                <span className="font-medium">Total Revenue</span>
 
                 <span className="text-lg font-bold">
                   {formatCurrency(totalRevenue)}
