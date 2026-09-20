@@ -33,8 +33,9 @@ interface RevenueBreakdownItem {
 export default function RevenuePage() {
   const [metrics, setMetrics] = useState<RevenueMetrics | null>(null);
 
-  const [topPerformingAssets, setTopPerformingAssets] =
-  useState<TopPerformingAsset[]>([]);
+  const [topPerformingAssets, setTopPerformingAssets] = useState<
+    TopPerformingAsset[]
+  >([]);
 
   const [revenueBreakdown, setRevenueBreakdown] = useState<
     RevenueBreakdownItem[]
@@ -46,8 +47,7 @@ export default function RevenuePage() {
 
   const [loadingBreakdown, setLoadingBreakdown] = useState(false);
 
-  const [selectedRevenue, setSelectedRevenue] =
-    useState<Revenue | null>(null);
+  const [selectedRevenue, setSelectedRevenue] = useState<Revenue | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -62,17 +62,14 @@ export default function RevenuePage() {
         setLoadingMetrics(true);
 
         const response = await Api.get("partner/revenue/metrics");
-
+        console.log({ response });
         if (response.data?.success) {
           setMetrics(response.data.data || null);
         } else {
           setMetrics(null);
         }
       } catch (error) {
-        console.error(
-          "Failed to fetch revenue metrics:",
-          error,
-        );
+        console.error("Failed to fetch revenue metrics:", error);
 
         setMetrics(null);
       } finally {
@@ -91,22 +88,15 @@ export default function RevenuePage() {
       try {
         setLoadingTopAssets(true);
 
-        const response = await Api.get(
-          "partner/revenue/top-performing-assets",
-        );
+        const response = await Api.get("partner/revenue/top-performing");
 
         if (response.data?.success) {
-          setTopPerformingAssets(
-            response.data.data || [],
-          );
+          setTopPerformingAssets(response.data.data || []);
         } else {
           setTopPerformingAssets([]);
         }
       } catch (error) {
-        console.error(
-          "Failed to fetch top performing assets:",
-          error,
-        );
+        console.error("Failed to fetch top performing assets:", error);
 
         setTopPerformingAssets([]);
       } finally {
@@ -115,6 +105,27 @@ export default function RevenuePage() {
     };
 
     fetchTopPerformingAssets();
+  }, []);
+
+  useEffect(() => {
+    const fetchRevenueBreakdown = async () => {
+      try {
+        setLoadingBreakdown(true);
+        const response = await Api.get("partner/revenue/breakdown"); // confirm this matches your actual route
+        if (response.data?.success) {
+          setRevenueBreakdown(response.data.data || []);
+        } else {
+          setRevenueBreakdown([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch revenue breakdown:", error);
+        setRevenueBreakdown([]);
+      } finally {
+        setLoadingBreakdown(false);
+      }
+    };
+
+    fetchRevenueBreakdown();
   }, []);
 
   return (
@@ -127,17 +138,14 @@ export default function RevenuePage() {
         </h1>
 
         <p className="mt-2 text-muted-foreground">
-          Track revenue performance, monitor transactions
-          and analyze your earnings.
+          Track revenue performance, monitor transactions and analyze your
+          earnings.
         </p>
       </section>
 
       {/* Revenue Metrics */}
 
-      <RevenueMetricCards
-        data={metrics}
-        loading={loadingMetrics}
-      />
+      <RevenueMetricCards data={metrics} loading={loadingMetrics} />
 
       {/* Revenue Analytics */}
 
@@ -150,10 +158,7 @@ export default function RevenuePage() {
 
         {/* Revenue Breakdown */}
 
-        <RevenueBreakdown
-          data={revenueBreakdown}
-          loading={loadingBreakdown}
-        />
+        <RevenueBreakdown data={revenueBreakdown} loading={loadingBreakdown} />
       </div>
 
       {/* Top Performing Assets */}
@@ -226,4 +231,3 @@ export default function RevenuePage() {
     </div>
   );
 }
-

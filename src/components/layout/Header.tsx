@@ -193,7 +193,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               aria-haspopup="menu"
             >
               <Image
-                src="https://i.pravatar.cc/100?img=12"
+                src={userData?.photo || "https://ui-avatars.com/api/?name=User&background=random"}
                 alt="Profile"
                 width={40}
                 height={40}

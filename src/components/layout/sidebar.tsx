@@ -189,7 +189,7 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
         <div className="mt-auto border-t bg-white p-5">
           <button className="flex w-full items-center gap-3 rounded-xl transition hover:bg-gray-100 p-3">
             <img
-              src="https://i.pravatar.cc/150?img=12"
+              src={userData?.photo || "https://ui-avatars.com/api/?name=User&background=random"}
               alt="profile"
               className="h-12 w-12 rounded-full object-cover"
             />

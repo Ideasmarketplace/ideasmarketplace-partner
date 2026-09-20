@@ -50,21 +50,15 @@ export const mockMembers: NetworkMember[] = Array.from(
 
     return {
       id: `MEM-${String(index + 1).padStart(3, "0")}`,
-      avatar: `https://i.pravatar.cc/150?img=${index + 1}`,
+      photo: `https://i.pravatar.cc/150?img=${index + 1}`,
       firstName,
       lastName,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       role: roles[index % roles.length],
       status: statuses[index % statuses.length],
-      joinedAt: "Jul 12, 2026",
-      lastActive:
-        index % 3 === 0
-          ? "5 mins ago"
-          : index % 3 === 1
-            ? "Yesterday"
-            : "3 days ago",
-      assetsManaged: Math.floor(Math.random() * 120),
-      revenueGenerated: Math.floor(Math.random() * 95000) + 5000,
+      createdAt: "Jul 12, 2026",
+      totalAssets: Math.floor(Math.random() * 120),
+      totalRevenue: Math.floor(Math.random() * 95000) + 5000,
       phone: "+1 (555) 123-4567",
       location: locations[index % locations.length],
       notes: "Trusted network member responsible for digital asset management.",

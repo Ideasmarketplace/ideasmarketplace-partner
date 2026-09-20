@@ -27,7 +27,9 @@ export type BadgeStatus =
   | "Refunded"
   | "Failed"
   | "Active"
-  | "Suspended";
+  | "Suspended"
+  | "verified"
+  | "unverified";
 
 interface StatusBadgeProps {
   status: BadgeStatus;
@@ -71,6 +73,16 @@ const badgeConfig: Record<
   },
 
   Rejected: {
+    icon: <XCircle className="h-3.5 w-3.5" />,
+    className: "bg-red-50 text-red-700 border-red-200",
+  },
+
+  verified: {
+    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  },
+
+  unverified: {
     icon: <XCircle className="h-3.5 w-3.5" />,
     className: "bg-red-50 text-red-700 border-red-200",
   },

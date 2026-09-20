@@ -7,7 +7,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "i.pravatar.cc",
       },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
     ],
+    dangerouslyAllowSVG: true,
   },
 };
 

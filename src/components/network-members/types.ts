@@ -12,16 +12,15 @@ export type MemberRole =
 
 export interface NetworkMember {
   id: string;
-  avatar: string;
+  photo: string;
   firstName: string;
   lastName: string;
   email: string;
   role: MemberRole;
   status: MemberStatus;
-  joinedAt: string;
-  lastActive: string;
-  assetsManaged: number;
-  revenueGenerated: number;
+  createdAt: string;
+  totalAssets: number;
+  totalRevenue: number;
   phone?: string;
   location?: string;
   notes?: string;
