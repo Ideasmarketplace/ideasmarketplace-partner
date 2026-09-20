@@ -14,7 +14,7 @@ export default function MemberProfile({
   return (
     <div className="flex flex-col items-center text-center">
       <Image
-        src={member.avatar}
+        src={member.photo}
         alt={`${member.firstName} ${member.lastName}`}
         width={96}
         height={96}
