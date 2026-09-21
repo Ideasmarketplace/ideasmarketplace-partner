@@ -39,7 +39,7 @@ const Login = () => {
       };
 
       const response = await Api.post("partner/auth/login", payload);
-
+      console.log({response});
       if (response.status === 200) {
         const { accessToken, partner, csrfToken } = response.data.data;
 
