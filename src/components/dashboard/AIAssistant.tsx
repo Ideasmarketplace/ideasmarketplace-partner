@@ -32,8 +32,6 @@ export default function AIAssistant() {
   const handleSend = () => {
     if (!message.trim()) return;
 
-    console.log(message);
-
     // TODO:
     // Send to your AI backend
 

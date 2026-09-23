@@ -1,15 +1,9 @@
-
 "use client";
 
 import Image from "next/image";
 import { ArrowUpRight, TrendingUp } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Skeleton } from "@/components/ui/skeleton";
 

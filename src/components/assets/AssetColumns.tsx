@@ -30,27 +30,20 @@ export const assetColumns = ({
       >
         <Image
           src={row.thumbnail}
-          alt={row.name}
+          alt={row.title}
           width={56}
           height={56}
           className="rounded-xl object-cover max-h-10"
         />
 
         <div className="min-w-0">
-          <p className="truncate font-semibold text-gray-900">{row.name}</p>
+          <p className="truncate font-semibold text-gray-900">{row.title}</p>
 
-          <p className="truncate text-sm text-gray-500">#{row.id}</p>
+          <p className="truncate text-sm text-gray-500">#{row.assetType}</p>
         </div>
       </div>
     ),
   },
-
-  {
-    id: "title",
-    header: "Title",
-    accessorKey: "title",
-  },
-
   {
     id: "category",
     header: "Category",
@@ -69,15 +62,49 @@ export const assetColumns = ({
   },
 
   {
-    id: "createdAt",
-    header: "Created",
+    id: "price",
+    header: "Price",
+    cell: (row) => (
+      <span className="font-semibold">₦{row.price.toLocaleString()}</span>
+    ),
+  },
+
+  {
+    id: "date",
+    header: "Date",
     accessorKey: "createdAt",
+    cell: (row) => {
+      const date = new Date(row?.createdAt);
+
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Africa/Lagos",
+      }).format(date);
+    },
   },
 
   {
     id: "updatedAt",
     header: "Last Modified",
     accessorKey: "updatedAt",
+    cell: (row) => {
+      const date = new Date(row?.updatedAt);
+
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Africa/Lagos",
+      }).format(date);
+    },
   },
 
   {

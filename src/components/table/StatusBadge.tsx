@@ -23,13 +23,13 @@ export type BadgeStatus =
   | "Approved"
   | "Paid"
   | "Unpaid"
-  | "Completed"
   | "Refunded"
   | "Failed"
   | "Active"
   | "Suspended"
   | "verified"
-  | "unverified";
+  | "unverified"
+  | "completed";
 
 interface StatusBadgeProps {
   status: BadgeStatus;
@@ -97,7 +97,7 @@ const badgeConfig: Record<
     className: "bg-orange-50 text-orange-700 border-orange-200",
   },
 
-  Completed: {
+  completed: {
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },

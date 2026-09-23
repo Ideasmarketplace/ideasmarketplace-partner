@@ -19,6 +19,7 @@ import { useUserStore } from "@/utils/user-store";
 import AssetIllustration from "@/components/AssetIllustration";
 import NetworkAssetCard from "@/components/network-assets/NetworkAssetCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Asset } from "@/components/assets/types";
 
 /* =========================================================
 Types
@@ -193,11 +194,32 @@ export default function NetworkAssetsPage() {
 
   const [page, setPage] = useState(1);
 
+  const [metrics, setMetrics] = useState<NetworkAssetMetrics | null>(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(true);
+
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
+
+  useEffect(() => {
+    const fetchAssetMetrics = async () => {
+      try {
+        setLoadingMetrics(true);
+
+        const response = await Api.get("partner/assets/metrics");
+        if (response.data?.success) {
+          setMetrics(response.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch asset metrics:", error);
+      } finally {
+        setLoadingMetrics(false);
+      }
+    };
+    fetchAssetMetrics();
+  }, []);
 
   /* =========================================================
 Fetch Network Assets
@@ -229,8 +251,6 @@ Fetch Network Assets
         const response = await Api.get(
           `partner/assets/network?${params.toString()}`,
         );
-
-        console.log({response})
 
         if (response.status === 200) {
           setData({
@@ -391,7 +411,6 @@ Error
     );
   }
 
-  const metrics = data?.metrics;
 
   const totalAssets = metrics?.totalAssets ?? 0;
   const publishedAssets = metrics?.publishedAssets ?? 0;

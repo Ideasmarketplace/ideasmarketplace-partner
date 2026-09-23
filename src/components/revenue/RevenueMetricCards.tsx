@@ -10,10 +10,9 @@ import {
 
 interface RevenueMetrics {
   totalRevenue?: number;
-  monthlyRevenue?: number;
-  pendingRevenue?: number;
-  pendingTransactions?: number;
-  averageRevenue?: number;
+  totalTransactions?: number;
+  totalCommission?: number;
+  averageOrderValue?: number;
 }
 
 interface RevenueMetricCardsProps {
@@ -80,28 +79,28 @@ export default function RevenueMetricCards({
     },
 
     {
-      title: "This Month",
-      value: formatCurrency(data?.monthlyRevenue),
+      title: "Total Transactions",
+      value: formatCurrency(data?.totalTransactions),
       change: "+0%",
-      description: "Compared to last month",
+      description: "Transactions from sales and commissions",
       icon: TrendingUp,
       color: "bg-indigo-100 text-indigo-600",
     },
 
     {
-      title: "Pending Revenue",
-      value: formatCurrency(data?.pendingRevenue),
+      title: "Commissions",
+      value: formatCurrency(data?.totalCommission),
       change: "+0%",
-      description: `${data?.pendingTransactions ?? 0} transactions`,
+      description: "Commissions from network members",
       icon: Clock3,
       color: "bg-amber-100 text-amber-600",
     },
 
     {
-      title: "Average Monthly",
-      value: formatCurrency(data?.averageRevenue),
+      title: "Average Sale Value",
+      value: formatCurrency(data?.averageOrderValue),
       change: "+0%",
-      description: "Last 12 months",
+      description: "Average value of all sales made",
       icon: Wallet,
       color: "bg-sky-100 text-sky-600",
     },
@@ -126,11 +125,11 @@ export default function RevenueMetricCards({
                 <Icon className="h-6 w-6" />
               </div>
 
-              <div className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
+              {/* <div className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600">
                 <ArrowUpRight className="h-3.5 w-3.5" />
 
                 {card.change}
-              </div>
+              </div> */}
             </div>
 
             {/* Body */}
