@@ -107,7 +107,7 @@ function NetworkAssetsSkeleton() {
         </section>
 
         {/* Metrics */}
-        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-6 md:grid-cols-3 xl:grid-cols-3">
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
@@ -486,7 +486,7 @@ Hero
         Metrics
     ===================================================== */}
 
-        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-6 md:grid-cols-3 xl:grid-cols-3">
           <NetworkAssetCard
             type="totalAssets"
             data={{
@@ -511,13 +511,13 @@ Hero
             }}
           />
 
-          <NetworkAssetCard
+          {/* <NetworkAssetCard
             type="members"
             data={{
               value: referredUsers,
               changeLabel: "Users in your network",
             }}
-          />
+          /> */}
         </section>
 
         {/* =====================================================
