@@ -4,5 +4,4 @@ export { default as AssetsMetricCards } from "./AssetsMetricCards";
 export { default as UploadAssetModal } from "./UploadAssetModal"
 export { default as CreateFolderModal } from "./CreateFolderModal"
 
-export * from "./MockAssets";
 export * from "./AssetColumns";

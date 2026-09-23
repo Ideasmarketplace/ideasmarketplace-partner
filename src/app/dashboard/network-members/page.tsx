@@ -40,14 +40,12 @@ export default function NetworkMembersPage() {
         setMetricsLoading(true);
 
         const response = await Api.get("partner/member/metrics");
-        console.log({response});
         if (response.data?.success) {
           setMetrics(response.data.data || null);
         } else {
           setMetrics(null);
         }
       } catch (error) {
-        console.error("Failed to fetch network metrics:", error);
 
         setMetrics(null);
       } finally {

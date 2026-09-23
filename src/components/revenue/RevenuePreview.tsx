@@ -16,7 +16,7 @@ export default function RevenuePreview({
       <div className="flex items-start gap-5">
         <Image
           src={revenue.assetThumbnail}
-          alt={revenue.assetName}
+          alt={revenue.itemTitle}
           width={90}
           height={90}
           className="rounded-xl object-cover"
@@ -26,7 +26,7 @@ export default function RevenuePreview({
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-xl font-semibold">
-                {revenue.assetName}
+                {revenue.itemTitle}
               </h3>
 
               <p className="mt-1 text-sm text-muted-foreground">
@@ -56,7 +56,7 @@ export default function RevenuePreview({
               </p>
 
               <h3 className="mt-1 font-semibold">
-                {revenue.source}
+                {revenue.itemType}
               </h3>
             </div>
           </div>

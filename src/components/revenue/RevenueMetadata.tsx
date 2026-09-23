@@ -19,12 +19,12 @@ export default function RevenueMetadata({
 
       <MetadataRow
         label="Customer"
-        value={revenue.customer}
+        value={revenue.buyerName}
       />
 
       <MetadataRow
         label="Revenue Source"
-        value={revenue.source}
+        value={revenue.itemType}
       />
 
       <MetadataRow

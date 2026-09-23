@@ -191,8 +191,6 @@ export default function DashboardPage() {
 
         const response = await Api.get("partner/dashboard/overview", {});
 
-        console.log("Dashboard overview:", response.data);
-
         if (response.data?.success) {
           setDashboard(response.data.data as DashboardData);
         } else {

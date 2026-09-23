@@ -23,13 +23,13 @@ export type BadgeStatus =
   | "Approved"
   | "Paid"
   | "Unpaid"
-  | "Completed"
   | "Refunded"
   | "Failed"
   | "Active"
   | "Suspended"
   | "verified"
-  | "unverified";
+  | "unverified"
+  | "Completed";
 
 interface StatusBadgeProps {
   status: BadgeStatus;

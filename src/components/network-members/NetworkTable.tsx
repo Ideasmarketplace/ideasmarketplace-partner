@@ -67,7 +67,6 @@ export default function NetworkTable({
         const response = await Api.get<MembersResponse>(
           `partner/member?${params.toString()}`
         );
-        console.log({response})
         if (response.data?.success) {
           setMembers(response.data.members || []);
 

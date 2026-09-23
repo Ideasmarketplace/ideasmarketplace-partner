@@ -30,6 +30,14 @@ interface RevenueBreakdownItem {
   percentage: number;
 }
 
+interface Transactions {
+  asset: string;
+  customer: string;
+  amount: number;
+  status: string;
+  date: any
+}
+
 export default function RevenuePage() {
   const [metrics, setMetrics] = useState<RevenueMetrics | null>(null);
 
@@ -41,11 +49,15 @@ export default function RevenuePage() {
     RevenueBreakdownItem[]
   >([]);
 
+  const [transactions, setTransactions] = useState(null)
+
   const [loadingMetrics, setLoadingMetrics] = useState(true);
 
   const [loadingTopAssets, setLoadingTopAssets] = useState(true);
 
   const [loadingBreakdown, setLoadingBreakdown] = useState(false);
+
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
 
   const [selectedRevenue, setSelectedRevenue] = useState<Revenue | null>(null);
 
@@ -62,7 +74,6 @@ export default function RevenuePage() {
         setLoadingMetrics(true);
 
         const response = await Api.get("partner/revenue/metrics");
-        console.log({ response });
         if (response.data?.success) {
           setMetrics(response.data.data || null);
         } else {
@@ -89,7 +100,6 @@ export default function RevenuePage() {
         setLoadingTopAssets(true);
 
         const response = await Api.get("partner/revenue/top-performing");
-
         if (response.data?.success) {
           setTopPerformingAssets(response.data.data || []);
         } else {
@@ -111,14 +121,13 @@ export default function RevenuePage() {
     const fetchRevenueBreakdown = async () => {
       try {
         setLoadingBreakdown(true);
-        const response = await Api.get("partner/revenue/breakdown"); // confirm this matches your actual route
+        const response = await Api.get("partner/revenue/breakdown"); 
         if (response.data?.success) {
           setRevenueBreakdown(response.data.data || []);
         } else {
           setRevenueBreakdown([]);
         }
       } catch (error) {
-        console.error("Failed to fetch revenue breakdown:", error);
         setRevenueBreakdown([]);
       } finally {
         setLoadingBreakdown(false);
@@ -127,6 +136,7 @@ export default function RevenuePage() {
 
     fetchRevenueBreakdown();
   }, []);
+
 
   return (
     <div className="space-y-8">
@@ -212,7 +222,7 @@ export default function RevenuePage() {
         onOpenChange={setDeleteOpen}
         title="Delete Revenue Record"
         description="This revenue record will be permanently removed."
-        itemName={selectedRevenue?.assetName}
+        itemName={selectedRevenue?.itemTitle}
         onConfirm={async () => {
           if (!selectedRevenue) {
             return;

@@ -2,6 +2,8 @@ export interface Asset {
   id: string;
   title: string;
   description: string;
+  assetType: string;
+  price: number;
   name: string;
   category: "Audio" | "Visual";
   type?: "image" | "video" | "audio" | "document";

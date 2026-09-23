@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 
 import {
   AssetsMetricCards,
@@ -72,8 +71,7 @@ export default function AssetsPage() {
     try {
       setLoadingMetrics(true);
 
-      const response = await Api.get("/partner/assets/metrics");
-
+      const response = await Api.get("partner/assets/metrics");
       if (response.data?.success) {
         setMetrics(response.data.data);
       }
@@ -94,8 +92,7 @@ export default function AssetsPage() {
       setLoadingAssets(true);
       setError(null);
 
-      const response = await Api.get("/partner/assets");
-
+      const response = await Api.get("partner/assets");
       if (response.data?.success) {
         const data = response.data.data;
         if (Array.isArray(data)) {
@@ -105,7 +102,6 @@ export default function AssetsPage() {
         }
       }
     } catch (error) {
-      console.error("Failed to fetch assets:", error);
 
       setError("Unable to load your assets. Please try again.");
     } finally {
@@ -208,7 +204,7 @@ export default function AssetsPage() {
       }
 
       await Api.delete(
-        `/partner/assets/${selectedAsset.type}/${selectedAsset.id}`,
+        `partner/assets/${selectedAsset.type}/${selectedAsset.id}`,
       );
 
       setDeleteOpen(false);

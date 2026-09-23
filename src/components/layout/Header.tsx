@@ -102,7 +102,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
           {/* Mobile Menu */}
           <button
             onClick={() => {
-              console.log("Menu clicked");
               onMenuClick?.();
             }}
             className="rounded-xl border border-gray-200 p-2 transition hover:bg-gray-100 lg:hidden"

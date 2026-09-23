@@ -4,22 +4,19 @@ export type RevenueStatus =
   | "Refunded";
 
 export type RevenueSource =
-  | "Asset Sale"
-  | "Streaming"
-  | "Subscription"
-  | "Licensing"
-  | "Royalty"
-  | "Referral";
+  | "Digital Asset"
+  | "Collection"
+  | "Audio Bundle"
+  | "Visual"
+  | "Idea"
 
 export interface Revenue {
   id: string;
-  assetId: string;
-  assetName: string;
+  itemTitle: string;
+  itemType: RevenueSource;
   assetThumbnail: string;
-  source: RevenueSource;
-  customer: string;
+  buyerName: string;
   amount: number;
-  currency: string;
   status: RevenueStatus;
   paymentMethod: string;
   reference: string;

@@ -18,20 +18,6 @@ interface RevenueTableProps {
   onDelete?: (revenue: Revenue) => void;
 }
 
-interface RevenueResponse {
-  success: boolean;
-  data?: {
-    transactions: Revenue[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-  };
-  message?: string;
-}
-
 export default function RevenueTable({
   onExport,
   onView,
@@ -63,14 +49,14 @@ export default function RevenueTable({
       try {
         setLoading(true);
 
-        const response = await Api.get<RevenueResponse>(
+        const response = await Api.get(
           `partner/revenue?page=${page}&limit=${pageSize}&search=${encodeURIComponent(
             search,
           )}`,
         );
 
         if (response.data?.success) {
-          const result = response.data.data;
+          const result = response.data;
 
           setRevenue(result?.transactions || []);
 

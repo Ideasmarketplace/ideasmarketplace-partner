@@ -20,7 +20,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <main className="min-w-0 flex-1 lg:ml-72">
           <Header
             onMenuClick={() => {
-              console.log("Opening sidebar");
               setSidebarOpen(true);
             }}
           />
