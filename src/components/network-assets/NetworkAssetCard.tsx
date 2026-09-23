@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import CountUp from "react-countup";
 
-export type StatType = "publishedAssets" | "totalAssets" | "drafts" | "members";
+export type StatType = "publishedAssets" | "totalAssets" | "drafts";
 
 export interface StatCardData {
   value: number;
@@ -52,12 +52,6 @@ const stats: Record<StatType, StatConfig> = {
     iconColor: "text-blue-600",
   },
 
-  members: {
-    title: "Contributing Members",
-    icon: Users,
-    iconBg: "bg-purple-100",
-    iconColor: "text-purple-600",
-  },
 };
 
 export default function NetworkAssetCard({ type, data }: StatCardProps) {
