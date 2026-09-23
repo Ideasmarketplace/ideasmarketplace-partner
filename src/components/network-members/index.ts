@@ -4,5 +4,4 @@ export { default as NetworkTable } from "./NetworkTable";
 export { default as MemberDetailsDrawer } from "./MemberDetailsDrawer";
 export { default as InviteMemberModal } from "./InviteMemberModal";
 
-export * from "./MockMembers";
 export * from "./types";

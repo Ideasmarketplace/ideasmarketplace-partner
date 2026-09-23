@@ -13,4 +13,3 @@ export { default as RevenueMetadata } from "./RevenueMetadata";
 export { default as RevenueActions } from "./RevenueActions";
 
 export * from "./types";
-export * from "./MockRevenue";
