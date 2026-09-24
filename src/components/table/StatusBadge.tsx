@@ -29,6 +29,7 @@ export type BadgeStatus =
   | "Suspended"
   | "verified"
   | "unverified"
+  | "completed"
   | "Completed";
 
 interface StatusBadgeProps {
@@ -98,6 +99,11 @@ const badgeConfig: Record<
   },
 
   Completed: {
+    icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  },
+  
+  completed: {
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
