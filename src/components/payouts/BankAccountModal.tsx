@@ -39,7 +39,7 @@ export default function BankAccountModal({
       swiftCode: "",
       currency: "USD",
       isDefault: false,
-    }
+    },
   );
 
   const handleSave = () => {
@@ -57,17 +57,11 @@ export default function BankAccountModal({
         </DialogHeader>
 
         <div className="max-h-[65vh] overflow-y-auto py-6">
-          <BankAccountForm
-            value={values}
-            onChange={setValues}
-          />
+          <BankAccountForm value={values} onChange={setValues} />
         </div>
 
         <div className="flex justify-end gap-3 border-t pt-6">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
 
