@@ -15,7 +15,7 @@ interface WithdrawAmountStepProps {
   availableBalance: number;
 }
 
-const PROCESSING_FEE = 25;
+const PROCESSING_FEE = 0;
 
 export default function WithdrawAmountStep({
   value,
@@ -35,7 +35,7 @@ export default function WithdrawAmountStep({
         </p>
 
         <h2 className="mt-2 text-3xl font-bold text-emerald-700">
-          ${availableBalance.toLocaleString()}
+          ₦{availableBalance.toLocaleString()}
         </h2>
       </div>
 
@@ -65,13 +65,13 @@ export default function WithdrawAmountStep({
         <div className="flex justify-between">
           <span>Processing Fee</span>
 
-          <span>${PROCESSING_FEE}</span>
+          <span>₦{PROCESSING_FEE}</span>
         </div>
 
         <div className="flex justify-between font-semibold">
           <span>You will receive</span>
 
-          <span>${netAmount.toLocaleString()}</span>
+          <span>₦{netAmount.toLocaleString()}</span>
         </div>
       </div>
     </div>

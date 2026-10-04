@@ -11,14 +11,12 @@ import { Report } from "./types";
 
 interface ReportColumnActions {
   onView?: (report: Report) => void;
-  onEdit?: (report: Report) => void;
   onPublish?: (report: Report) => void;
   onDelete?: (report: Report) => void;
 }
 
 export function ReportColumns({
   onView,
-  onEdit,
   onPublish,
   onDelete,
 }: ReportColumnActions): TableColumn<Report>[] {
@@ -107,22 +105,6 @@ export function ReportColumns({
               label: "View",
               icon: <Eye className="h-4 w-4" />,
               onClick: () => onView?.(row),
-            },
-            {
-              label: "Edit",
-              icon: <Pencil className="h-4 w-4" />,
-              onClick: () => onEdit?.(row),
-            },
-            {
-              label: "Publish",
-              icon: <UploadCloud className="h-4 w-4" />,
-              onClick: () => onPublish?.(row),
-            },
-            {
-              label: "Delete",
-              destructive: true,
-              icon: <Trash2 className="h-4 w-4" />,
-              onClick: () => onDelete?.(row),
             },
           ]}
         />

@@ -28,14 +28,8 @@ interface ReportActionsProps {
 }
 
 export default function ReportActions({
-  onEdit,
-  onPublish,
   onDownload,
-  onDelete,
-  isPublished = false,
   isDownloading = false,
-  isPublishing = false,
-  isDeleting = false,
 }: ReportActionsProps) {
   return (
     <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
@@ -44,29 +38,6 @@ export default function ReportActions({
       </h3>
 
       <div className="space-y-3">
-        <Button
-          className="w-full justify-start"
-          variant="outline"
-          onClick={onEdit}
-        >
-          <Pencil className="mr-2 h-4 w-4" />
-          Edit Report
-        </Button>
-
-        <Button
-          className="w-full justify-start"
-          onClick={onPublish}
-          disabled={isPublished || isPublishing}
-        >
-          <UploadCloud className="mr-2 h-4 w-4" />
-
-          {isPublished
-            ? "Already Published"
-            : isPublishing
-            ? "Publishing..."
-            : "Publish Report"}
-        </Button>
-
         <Button
           className="w-full justify-start"
           variant="secondary"
@@ -78,19 +49,6 @@ export default function ReportActions({
           {isDownloading
             ? "Downloading..."
             : "Download Report"}
-        </Button>
-
-        <Button
-          className="w-full justify-start"
-          variant="destructive"
-          onClick={onDelete}
-          disabled={isDeleting}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-
-          {isDeleting
-            ? "Deleting..."
-            : "Delete Report"}
         </Button>
       </div>
     </div>

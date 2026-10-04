@@ -18,7 +18,6 @@ interface ReportPreviewDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   report?: Report | null;
-  onEdit?: (report: Report) => void;
   onPublish?: (report: Report) => void;
   onDownload?: (report: Report) => void;
   onDelete?: (report: Report) => void;
@@ -28,10 +27,7 @@ export default function ReportPreviewDrawer({
   open,
   onOpenChange,
   report,
-  onEdit,
-  onPublish,
   onDownload,
-  onDelete,
 }: ReportPreviewDrawerProps) {
   if (!report) return null;
 
@@ -52,11 +48,7 @@ export default function ReportPreviewDrawer({
           <ReportPreview report={report} />
           <ReportMetadata report={report} />
           <ReportActions
-            isPublished={report.status === "Published"}
-            onEdit={() => onEdit?.(report)}
-            onPublish={() => onPublish?.(report)}
             onDownload={() => onDownload?.(report)}
-            onDelete={() => onDelete?.(report)}
           />
         </div>
       </SheetContent>

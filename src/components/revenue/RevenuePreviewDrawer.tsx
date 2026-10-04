@@ -21,33 +21,22 @@ interface RevenuePreviewDrawerProps {
 
   revenue?: Revenue | null;
 
-  onEdit?: (revenue: Revenue) => void;
-
   onExport?: (revenue: Revenue) => void;
-
-  onDelete?: (revenue: Revenue) => void;
 }
 
 export default function RevenuePreviewDrawer({
   open,
   onOpenChange,
   revenue,
-  onEdit,
   onExport,
-  onDelete,
 }: RevenuePreviewDrawerProps) {
   if (!revenue) return null;
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>
-            Revenue Details
-          </SheetTitle>
+          <SheetTitle>Revenue Details</SheetTitle>
 
           <SheetDescription>
             View transaction information and manage this revenue record.
@@ -59,11 +48,7 @@ export default function RevenuePreviewDrawer({
 
           <RevenueMetadata revenue={revenue} />
 
-          <RevenueActions
-            onEdit={() => onEdit?.(revenue)}
-            onExport={() => onExport?.(revenue)}
-            onDelete={() => onDelete?.(revenue)}
-          />
+          <RevenueActions onExport={() => onExport?.(revenue)} />
         </div>
       </SheetContent>
     </Sheet>

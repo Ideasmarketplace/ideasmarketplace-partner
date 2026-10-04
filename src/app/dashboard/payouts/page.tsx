@@ -17,9 +17,9 @@ import {
   HowPayoutWorks,
   BankAccountsCard,
   BankAccountModal,
-  PayoutSummary
+  PayoutSummary,
 } from "@/components/payouts";
-
+import { useRouter } from "next/navigation";
 
 interface PayoutResponse {
   payouts?: Payout[];
@@ -32,11 +32,9 @@ interface PayoutResponse {
 }
 
 export default function PayoutsPage() {
-  const [selectedPayout, setSelectedPayout] =
-    useState<Payout | null>(null);
+  const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
 
-  const [selectedBank, setSelectedBank] =
-    useState<BankAccount | null>(null);
+  const [selectedBank, setSelectedBank] = useState<BankAccount | null>(null);
 
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -45,8 +43,9 @@ export default function PayoutsPage() {
   const [deletePayoutOpen, setDeletePayoutOpen] = useState(false);
   const [deleteBankOpen, setDeleteBankOpen] = useState(false);
 
-  const [payoutSummary, setPayoutSummary] =
-    useState<PayoutSummary | null>(null);
+  const [payoutSummary, setPayoutSummary] = useState<PayoutSummary | null>(
+    null,
+  );
 
   const [payouts, setPayouts] = useState<Payout[]>([]);
 
@@ -60,6 +59,8 @@ export default function PayoutsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
+  const router = useRouter();
+
   /*
    * Fetch payout summary
    */
@@ -68,17 +69,12 @@ export default function PayoutsPage() {
 
     try {
       const response = await Api.get("/partner/payouts/summary");
-
+      console.log({ payoutSummary });
       if (response.data?.success) {
-        setPayoutSummary(
-          response.data.data || response.data,
-        );
+        setPayoutSummary(response.data.data || response.data);
       }
     } catch (error) {
-      console.error(
-        "Failed to fetch payout summary:",
-        error,
-      );
+      console.error("Failed to fetch payout summary:", error);
     } finally {
       setSummaryLoading(false);
     }
@@ -101,24 +97,16 @@ export default function PayoutsPage() {
       if (response.data?.success) {
         const responseData = response.data;
 
-        const result: PayoutResponse =
-          responseData.data || responseData;
+        const result: PayoutResponse = responseData.data || responseData;
 
         setPayouts(result.payouts || []);
 
-        setTotalPages(
-          result.pagination?.pages || 1,
-        );
+        setTotalPages(result.pagination?.pages || 1);
 
-        setTotalItems(
-          result.pagination?.total || 0,
-        );
+        setTotalItems(result.pagination?.total || 0);
       }
     } catch (error) {
-      console.error(
-        "Failed to fetch payouts:",
-        error,
-      );
+      console.error("Failed to fetch payouts:", error);
 
       setPayouts([]);
       setTotalPages(1);
@@ -145,32 +133,21 @@ export default function PayoutsPage() {
   /*
    * View payout details
    */
-  const handleViewPayout = async (
-    payout: Payout,
-  ) => {
+  const handleViewPayout = async (payout: Payout) => {
     try {
-      const payoutId =
-        (payout as any)._id ||
-        (payout as any).id;
+      const payoutId = (payout as any)._id || (payout as any).id;
 
-      const response = await Api.get(
-        `/partner/payouts/${payoutId}`,
-      );
+      const response = await Api.get(`/partner/payouts/${payoutId}`);
 
       if (response.data?.success) {
         setSelectedPayout(
-          response.data.data ||
-            response.data.payout ||
-            response.data,
+          response.data.data || response.data.payout || response.data,
         );
 
         setDrawerOpen(true);
       }
     } catch (error) {
-      console.error(
-        "Failed to fetch payout details:",
-        error,
-      );
+      console.error("Failed to fetch payout details:", error);
 
       /*
        * Fall back to the table record.
@@ -188,12 +165,9 @@ export default function PayoutsPage() {
 
     try {
       const payoutId =
-        (selectedPayout as any)._id ||
-        (selectedPayout as any).id;
+        (selectedPayout as any)._id || (selectedPayout as any).id;
 
-      await Api.patch(
-        `/partner/payouts/${payoutId}/cancel`,
-      );
+      await Api.patch(`/partner/payouts/${payoutId}/cancel`);
 
       setDeletePayoutOpen(false);
       setDrawerOpen(false);
@@ -202,10 +176,7 @@ export default function PayoutsPage() {
       await fetchPayoutSummary();
       await fetchPayouts();
     } catch (error) {
-      console.error(
-        "Failed to cancel payout:",
-        error,
-      );
+      console.error("Failed to cancel payout:", error);
     }
   };
 
@@ -215,14 +186,9 @@ export default function PayoutsPage() {
    * The payload should match whatever
    * WithdrawFundsModal sends.
    */
-  const handleWithdraw = async (
-    payload: any,
-  ) => {
+  const handleWithdraw = async (payload: any) => {
     try {
-      await Api.post(
-        "/partner/payouts/request",
-        payload,
-      );
+      await Api.post("/partner/payouts/request", payload);
 
       setWithdrawOpen(false);
 
@@ -233,10 +199,7 @@ export default function PayoutsPage() {
       await fetchPayoutSummary();
       await fetchPayouts();
     } catch (error) {
-      console.error(
-        "Failed to request withdrawal:",
-        error,
-      );
+      console.error("Failed to request withdrawal:", error);
     }
   };
 
@@ -246,9 +209,7 @@ export default function PayoutsPage() {
       <main className="space-y-6">
         {/* Header */}
         <section>
-          <h1 className="text-4xl font-bold tracking-tight">
-            Payouts
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">Payouts</h1>
 
           <p className="mt-2 text-muted-foreground">
             Withdraw your earnings and manage your payout accounts.
@@ -259,9 +220,7 @@ export default function PayoutsPage() {
         <PayoutMetricCards
           data={payoutSummary}
           loading={summaryLoading}
-          onWithdraw={() =>
-            setWithdrawOpen(true)
-          }
+          onWithdraw={() => setWithdrawOpen(true)}
         />
 
         {/* Table */}
@@ -320,6 +279,8 @@ export default function PayoutsPage() {
           open={withdrawOpen}
           onOpenChange={setWithdrawOpen}
           onSubmit={handleWithdraw}
+          availableBalance={payoutSummary?.availableBalance}
+          onAddBankDetails={() => router.push("/dashboard/profile")}
         />
 
         {/* Add/Edit Bank */}
@@ -334,10 +295,7 @@ export default function PayoutsPage() {
 
         {/* Delete Payout */}
         <DeleteConfirmationDialog
-          open={
-            deletePayoutOpen &&
-            !!selectedPayout
-          }
+          open={deletePayoutOpen && !!selectedPayout}
           onOpenChange={setDeletePayoutOpen}
           title="Delete Payout"
           description="Are you sure you want to delete this payout record?"
@@ -347,10 +305,7 @@ export default function PayoutsPage() {
 
         {/* Delete Bank */}
         <DeleteConfirmationDialog
-          open={
-            deleteBankOpen &&
-            !!selectedBank
-          }
+          open={deleteBankOpen && !!selectedBank}
           onOpenChange={setDeleteBankOpen}
           title="Remove Bank Account"
           description="This bank account will no longer be available for future withdrawals."

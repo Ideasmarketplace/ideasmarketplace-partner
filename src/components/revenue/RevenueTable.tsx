@@ -102,8 +102,6 @@ export default function RevenueTable({
       <DataTable
         columns={revenueColumns({
           onView,
-          onEdit,
-          onDelete,
         })}
         data={revenue}
         toolbar={<RevenueToolbar onExport={onExport} />}

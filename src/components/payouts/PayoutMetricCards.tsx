@@ -1,21 +1,18 @@
 "use client";
 
-import {
-  Wallet,
-  Clock3,
-  Landmark,
-  CreditCard,
-} from "lucide-react";
+import { Wallet, Clock3, Landmark, CreditCard } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 export interface PayoutSummary {
   availableBalance: number;
   pendingBalance: number;
   totalPaidOut: number;
   lastPayout: number;
+  lastPayoutDate?: string | null; // new
 }
 
 interface PayoutMetricCardsProps {
@@ -52,10 +49,13 @@ export default function PayoutMetricCards({
       icon: Landmark,
       color: "bg-indigo-100 text-indigo-600",
     },
+    // Last Payout metric:
     {
       title: "Last Payout",
       value: data?.lastPayout ?? 0,
-      subtitle: "Most recent payout",
+      subtitle: data?.lastPayoutDate
+        ? format(new Date(data.lastPayoutDate), "MMM dd, yyyy")
+        : "No payouts yet",
       icon: CreditCard,
       color: "bg-sky-100 text-sky-600",
     },
@@ -67,10 +67,7 @@ export default function PayoutMetricCards({
         const Icon = metric.icon;
 
         return (
-          <Card
-            key={metric.title}
-            className="rounded-3xl shadow-sm"
-          >
+          <Card key={metric.title} className="rounded-3xl shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div>
@@ -82,7 +79,7 @@ export default function PayoutMetricCards({
                     <Skeleton className="mt-2 h-9 w-32" />
                   ) : (
                     <h3 className="mt-2 text-3xl font-bold">
-                      ${metric.value.toLocaleString()}
+                      ₦{metric.value.toLocaleString()}
                     </h3>
                   )}
 

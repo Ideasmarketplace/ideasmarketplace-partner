@@ -203,15 +203,8 @@ export default function RevenuePage() {
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
         revenue={selectedRevenue}
-        onEdit={(revenue) => {
-          console.log("Edit revenue:", revenue);
-        }}
         onExport={(revenue) => {
           console.log("Export revenue:", revenue);
-        }}
-        onDelete={(revenue) => {
-          setSelectedRevenue(revenue);
-          setDeleteOpen(true);
         }}
       />
 

@@ -40,7 +40,7 @@ interface NetworkAsset {
   description?: string;
   category?: string;
   price?: number;
-  status: "draft" | "published";
+  status: "approved" | "pending";
   assetType: "audio" | "visual";
   thumbnail?: string;
 
@@ -208,7 +208,8 @@ export default function NetworkAssetsPage() {
       try {
         setLoadingMetrics(true);
 
-        const response = await Api.get("partner/assets/metrics");
+        const response = await Api.get("partner/assets/network/metrics");
+        console.log({ response });
         if (response.data?.success) {
           setMetrics(response.data.data);
         }
@@ -251,7 +252,7 @@ Fetch Network Assets
         const response = await Api.get(
           `partner/assets/network?${params.toString()}`,
         );
-
+        console.log({ response });
         if (response.status === 200) {
           setData({
             assets: response.data.assets || [],
@@ -411,7 +412,6 @@ Error
     );
   }
 
-
   const totalAssets = metrics?.totalAssets ?? 0;
   const publishedAssets = metrics?.publishedAssets ?? 0;
   const draftAssets = metrics?.draftAssets ?? 0;
@@ -535,12 +535,12 @@ Hero
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search network assets..."
-                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10"
+                className="h-11 w-full md:w-[400px] rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10"
               />
             </div>
 
             {/* Status */}
-            <select
+            {/* <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-700 outline-none focus:border-primary"
@@ -548,10 +548,10 @@ Hero
               <option value="">All statuses</option>
               <option value="published">Published</option>
               <option value="draft">Draft</option>
-            </select>
+            </select> */}
 
             {/* Category */}
-            <select
+            {/* <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-700 outline-none focus:border-primary"
@@ -559,7 +559,7 @@ Hero
               <option value="">All categories</option>
               <option value="audio">Audio</option>
               <option value="visual">Visual</option>
-            </select>
+            </select> */}
           </div>
         </section>
 
@@ -678,14 +678,22 @@ Hero
                                 <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-100">
                                   {asset.owner.photo ? (
                                     <img
-                                      src={asset.owner.photo}
-                                      alt={`${asset.owner.firstName} ${asset.owner.lastName}`}
+                                      src={asset?.owner?.photo}
+                                      alt={`${asset.owner.firstName
+                                        ?.charAt(0)
+                                        .toUpperCase()} ${asset.owner.lastName
+                                        ?.charAt(0)
+                                        .toUpperCase()}`}
                                       className="h-full w-full object-cover"
                                     />
                                   ) : (
                                     <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-gray-500">
-                                      {asset.owner.firstName?.[0]}
-                                      {asset.owner.lastName?.[0]}
+                                      {asset.owner.firstName
+                                        ?.charAt(0)
+                                        .toUpperCase()}
+                                      {asset.owner.lastName
+                                        ?.charAt(0)
+                                        .toUpperCase()}
                                     </div>
                                   )}
                                 </div>
@@ -719,7 +727,7 @@ Hero
 
                           {/* Status */}
                           <td className="px-6 py-4">
-                            {asset.status === "published" ? (
+                            {asset.status === "approved" ? (
                               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                                 <FileCheck2 className="h-3.5 w-3.5" />
                                 Published

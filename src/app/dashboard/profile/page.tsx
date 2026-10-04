@@ -26,6 +26,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserStore } from "@/utils/user-store";
+import BankDetailsCard from "@/components/profile/BankDetailsCard";
 
 interface Profile {
   companyName?: string;
@@ -279,6 +280,8 @@ export default function ProfilePage() {
                 <ContactInformationCard
                   profile={userData}
                 />
+
+                <BankDetailsCard />
 
                 <LogoUploader profile={userData} />
               </TabsContent>

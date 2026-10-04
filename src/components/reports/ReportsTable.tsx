@@ -7,27 +7,17 @@ import DataTablePagination from "@/components/table/DataTablePagination";
 
 import ReportsToolbar from "./ReportsToolbar";
 import { ReportColumns } from "./ReportsColumns";
-import { mockReports } from "./MockReports";
 import { Report } from "./types";
 
 interface ReportsTableProps {
   onCreateReport: () => void;
 
   onView?: (report: Report) => void;
-
-  onEdit?: (report: Report) => void;
-
-  onPublish?: (report: Report) => void;
-
-  onDelete?: (report: Report) => void;
 }
 
 export default function ReportsTable({
   onCreateReport,
   onView,
-  onEdit,
-  onPublish,
-  onDelete,
 }: ReportsTableProps) {
   const [page, setPage] = useState(1);
 
@@ -37,18 +27,18 @@ export default function ReportsTable({
 
   const [category, setCategory] = useState("all");
 
-  const [sort, setSort] = useState("latest");
+  const [sort, setSort] = useState<any>("latest");
 
   const pageSize = 10;
 
   const filteredReports = useMemo(() => {
-    let reports = [...mockReports];
+    let reports:any = [];
 
     if (search.trim()) {
       const value = search.toLowerCase();
 
       reports = reports.filter(
-        (report) =>
+        (report:any) =>
           report.title.toLowerCase().includes(value) ||
           report.author.toLowerCase().includes(value) ||
           report.category.toLowerCase().includes(value),
@@ -57,32 +47,32 @@ export default function ReportsTable({
 
     if (status !== "all") {
       reports = reports.filter(
-        (report) => report.status === status,
+        (report:any) => report.status === status,
       );
     }
 
     if (category !== "all") {
       reports = reports.filter(
-        (report) => report.category === category,
+        (report:any) => report.category === category,
       );
     }
 
     switch (sort) {
       case "title":
-        reports.sort((a, b) =>
+        reports.sort((a:any, b:any) =>
           a.title.localeCompare(b.title),
         );
         break;
 
       case "downloads":
         reports.sort(
-          (a, b) => b.downloads - a.downloads,
+          (a:any, b:any) => b.downloads - a.downloads,
         );
         break;
 
       case "views":
         reports.sort(
-          (a, b) => b.views - a.views,
+          (a:any, b:any) => b.views - a.views,
         );
         break;
 
@@ -114,11 +104,8 @@ export default function ReportsTable({
     () =>
       ReportColumns({
         onView,
-        onEdit,
-        onPublish,
-        onDelete,
       }),
-    [onView, onEdit, onPublish, onDelete],
+    [onView],
   );
 
   return (
