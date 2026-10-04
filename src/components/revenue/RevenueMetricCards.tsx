@@ -80,7 +80,7 @@ export default function RevenueMetricCards({
 
     {
       title: "Total Transactions",
-      value: formatCurrency(data?.totalTransactions),
+      value: (data?.totalTransactions ?? 0).toLocaleString(),
       change: "+0%",
       description: "Transactions from sales and commissions",
       icon: TrendingUp,

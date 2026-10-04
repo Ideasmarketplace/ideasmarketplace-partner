@@ -35,7 +35,7 @@ export default function PayoutToolbar({
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline">
+        {/* <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" />
           Filter
         </Button>
@@ -51,7 +51,7 @@ export default function PayoutToolbar({
         >
           <Download className="mr-2 h-4 w-4" />
           Export
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

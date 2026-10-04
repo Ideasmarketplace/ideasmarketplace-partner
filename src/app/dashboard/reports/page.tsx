@@ -216,10 +216,6 @@ export default function ReportsPage() {
                 setGenerateOpen(true)
               }
               onView={handleViewReport}
-              onDelete={(report) => {
-                setSelectedReport(report);
-                setDeleteOpen(true);
-              }}
             />
 
             {/* Report Preview Drawer */}
@@ -228,10 +224,6 @@ export default function ReportsPage() {
               open={drawerOpen}
               onOpenChange={setDrawerOpen}
               report={selectedReport}
-              onDelete={(report) => {
-                setSelectedReport(report);
-                setDeleteOpen(true);
-              }}
             />
 
             {/* Generate Report Modal */}

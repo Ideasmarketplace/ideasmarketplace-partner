@@ -16,7 +16,6 @@ interface RevenueColumnProps {
 
 export function revenueColumns({
   onView,
-  onEdit,
   onDelete,
 }: RevenueColumnProps): TableColumn<Revenue>[] {
   return [
@@ -115,11 +114,6 @@ export function revenueColumns({
               label: "View",
               icon: <Eye className="h-4 w-4" />,
               onClick: () => onView?.(row),
-            },
-            {
-              label: "Edit",
-              icon: <Pencil className="h-4 w-4" />,
-              onClick: () => onEdit?.(row),
             },
             {
               label: "Delete",
