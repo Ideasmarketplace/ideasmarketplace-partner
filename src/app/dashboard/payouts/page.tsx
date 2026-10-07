@@ -7,7 +7,6 @@ import Api from "@/utils/api";
 import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDialog";
 
 import {
-  mockBankAccounts,
   Payout,
   BankAccount,
   PayoutMetricCards,
@@ -15,7 +14,6 @@ import {
   PayoutPreviewDrawer,
   WithdrawFundsModal,
   HowPayoutWorks,
-  BankAccountsCard,
   BankAccountModal,
   PayoutSummary,
 } from "@/components/payouts";
