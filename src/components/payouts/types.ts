@@ -13,7 +13,7 @@ export interface Payout {
   accountName: string;
   accountNumber: string;
   status: PayoutStatus;
-  requestedAt: string;
+  createdAt: string;
   processedAt?: string;
   notes?: string;
 }

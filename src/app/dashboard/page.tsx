@@ -15,6 +15,7 @@ import HeroIllustration from "@/components/HeroIllustration";
 
 import Api from "@/utils/api";
 import { useUserStore } from "@/utils/user-store";
+import { useRouter } from "next/navigation";
 
 /* =========================================================
    Types
@@ -177,7 +178,7 @@ export default function DashboardPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const token = useUserStore((state) => state.token);
+  const router = useRouter();
 
   /* =========================================================
      Fetch Dashboard Overview
@@ -368,14 +369,21 @@ export default function DashboardPage() {
                 workspace.
               </p>
 
-              <div ref={buttonsRef} className="mt-8 flex flex-wrap gap-4">
+              <div
+                ref={buttonsRef}
+                className="mt-8 flex flex-wrap gap-4"
+                onClick={() => router.push("/dashboard/revenue")}
+              >
                 <button className="rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white transition hover:bg-indigo-700">
                   View Earnings
                 </button>
 
-                <button className="rounded-xl border border-sky-200 bg-white px-6 py-3 font-medium text-sky-700 transition hover:bg-sky-50">
+                {/* <button
+                  onClick={() => router.push("/dashboard/reports")}
+                  className="rounded-xl border border-sky-200 bg-white px-6 py-3 font-medium text-sky-700 transition hover:bg-sky-50"
+                >
                   Generate Reports
-                </button>
+                </button> */}
               </div>
             </div>
 
