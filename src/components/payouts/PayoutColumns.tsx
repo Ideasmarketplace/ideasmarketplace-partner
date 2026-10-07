@@ -14,14 +14,10 @@ import { Payout } from "./types";
 
 interface PayoutColumnProps {
   onView?: (payout: Payout) => void;
-  onEdit?: (payout: Payout) => void;
-  onDelete?: (payout: Payout) => void;
 }
 
 export function payoutColumns({
   onView,
-  onEdit,
-  onDelete,
 }: PayoutColumnProps): TableColumn<Payout>[] {
   return [
     {
@@ -53,7 +49,7 @@ export function payoutColumns({
 
       cell: (row) => (
         <span className="font-semibold">
-          ${row.amount.toLocaleString()}
+          ₦{row.amount.toLocaleString()}
         </span>
       ),
     },
@@ -62,7 +58,7 @@ export function payoutColumns({
       id: "fee",
       header: "Fee",
 
-      cell: (row) => `$${row.fee.toLocaleString()}`,
+      cell: (row) => `₦${row.fee.toLocaleString()}`,
     },
 
     {
@@ -71,7 +67,7 @@ export function payoutColumns({
 
       cell: (row) => (
         <span className="font-semibold text-emerald-600">
-          ${row.netAmount.toLocaleString()}
+          ₦{row.netAmount.toLocaleString()}
         </span>
       ),
     },
@@ -86,39 +82,41 @@ export function payoutColumns({
     },
 
     {
-      id: "requestedAt",
+      id: "createdAt",
       header: "Requested",
-      accessorKey: "requestedAt",
+      accessorKey: "createdAt",
+      cell: (row) => {
+        const date = new Date(row?.createdAt);
+
+        return new Intl.DateTimeFormat("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Africa/Lagos",
+        }).format(date);
+      },
     },
 
-    {
-      id: "actions",
-      header: "",
-      align: "right",
+    // {
+    //   id: "actions",
+    //   header: "",
+    //   align: "right",
 
-      cell: (row) => (
-        <ActionMenu
-          row={row}
-          actions={[
-            {
-              label: "View",
-              icon: <Eye className="h-4 w-4" />,
-              onClick: () => onView?.(row),
-            },
-            {
-              label: "Edit",
-              icon: <Pencil className="h-4 w-4" />,
-              onClick: () => onEdit?.(row),
-            },
-            {
-              label: "Delete",
-              destructive: true,
-              icon: <Trash2 className="h-4 w-4" />,
-              onClick: () => onDelete?.(row),
-            },
-          ]}
-        />
-      ),
-    },
+    //   cell: (row) => (
+    //     <ActionMenu
+    //       row={row}
+    //       actions={[
+    //         {
+    //           label: "View",
+    //           icon: <Eye className="h-4 w-4" />,
+    //           onClick: () => onView?.(row),
+    //         },
+    //       ]}
+    //     />
+    //   ),
+    // },
   ];
 }

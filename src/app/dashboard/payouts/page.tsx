@@ -7,7 +7,6 @@ import Api from "@/utils/api";
 import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDialog";
 
 import {
-  mockBankAccounts,
   Payout,
   BankAccount,
   PayoutMetricCards,
@@ -15,14 +14,13 @@ import {
   PayoutPreviewDrawer,
   WithdrawFundsModal,
   HowPayoutWorks,
-  BankAccountsCard,
   BankAccountModal,
   PayoutSummary,
 } from "@/components/payouts";
 import { useRouter } from "next/navigation";
 
 interface PayoutResponse {
-  payouts?: Payout[];
+  withdrawals?: Payout[];
   pagination?: {
     page: number;
     limit: number;
@@ -93,13 +91,13 @@ export default function PayoutsPage() {
           limit: pageSize,
         },
       });
-
+      console.log({ response });
       if (response.data?.success) {
         const responseData = response.data;
 
         const result: PayoutResponse = responseData.data || responseData;
 
-        setPayouts(result.payouts || []);
+        setPayouts(result.withdrawals || []);
 
         setTotalPages(result.pagination?.pages || 1);
 
@@ -233,10 +231,6 @@ export default function PayoutsPage() {
           pageSize={pageSize}
           onPageChange={setPage}
           onView={handleViewPayout}
-          onDelete={(payout) => {
-            setSelectedPayout(payout);
-            setDeletePayoutOpen(true);
-          }}
         />
 
         {/* Information */}

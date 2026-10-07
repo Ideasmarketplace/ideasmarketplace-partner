@@ -21,8 +21,6 @@ interface PayoutTableProps {
   onPageChange?: (page: number) => void;
 
   onView?: (payout: Payout) => void;
-  onEdit?: (payout: Payout) => void;
-  onDelete?: (payout: Payout) => void;
   onExport?: () => void;
 }
 
@@ -38,8 +36,6 @@ export default function PayoutTable({
   onPageChange,
 
   onView,
-  onEdit,
-  onDelete,
   onExport,
 }: PayoutTableProps) {
   const [search, setSearch] = useState("");
@@ -61,8 +57,6 @@ export default function PayoutTable({
       <DataTable
         columns={payoutColumns({
           onView,
-          onEdit,
-          onDelete,
         })}
         data={filteredPayouts}
         toolbar={

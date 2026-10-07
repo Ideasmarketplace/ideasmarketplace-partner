@@ -35,7 +35,7 @@ export default function PayoutMetadata({
 
       <MetadataRow
         label="Requested"
-        value={payout.requestedAt}
+        value={payout.createdAt}
       />
 
       <MetadataRow

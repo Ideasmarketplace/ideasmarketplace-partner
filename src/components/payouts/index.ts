@@ -11,6 +11,5 @@ export { default as BankAccountModal } from "./BankAccountModal";
 export { default as BankAccountsCard } from "./BankAccountsCard";
 export { default as HowPayoutWorks } from "./HowPayoutWorks";
 
-export * from "./MockPayouts";
 export * from "./MockBankAccounts";
 export * from "./types";

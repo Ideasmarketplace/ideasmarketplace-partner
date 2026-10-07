@@ -11,8 +11,6 @@ import {
   Tooltip,
 } from "recharts";
 
-import { payoutHistory } from "./MockPayouts";
-
 export default function PayoutHistoryChart() {
   return (
     <Card className="rounded-3xl shadow-sm">
@@ -27,7 +25,7 @@ export default function PayoutHistoryChart() {
       <CardContent>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={payoutHistory}>
+            <LineChart data={[]}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
               <XAxis dataKey="month" tickLine={false} axisLine={false} />
