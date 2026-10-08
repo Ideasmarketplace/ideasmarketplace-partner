@@ -1,114 +1,99 @@
 "use client";
 
-import Image from "next/image";
-
-import { Eye, Pencil, Trash2, UploadCloud, FileText } from "lucide-react";
+import { format, isValid } from "date-fns";
+import { Download, Eye } from "lucide-react";
 
 import ActionMenu from "@/components/table/ActionMenu";
 import { TableColumn } from "@/components/table/types";
-import ReportStatusBadge from "./ReportStatusBadge";
+import StatusBadge from "@/components/table/StatusBadge";
+import { PERIOD_LABELS, REPORT_TYPE_LABELS } from "./report-options";
 import { Report } from "./types";
 
 interface ReportColumnActions {
   onView?: (report: Report) => void;
-  onPublish?: (report: Report) => void;
-  onDelete?: (report: Report) => void;
+  onExport?: (report: Report) => void;
 }
+
+const formatDate = (v?: string) => {
+  if (!v) return "—";
+  const d = new Date(v);
+  return isValid(d) ? format(d, "MMM d, yyyy") : "—";
+};
 
 export function ReportColumns({
   onView,
-  onPublish,
-  onDelete,
+  onExport,
 }: ReportColumnActions): TableColumn<Report>[] {
   return [
     {
       id: "report",
       header: "Report",
-      width: "340px",
-
+      width: "320px",
       cell: (row) => (
-        <div className="flex items-center gap-4">
-          <Image
-            src={row.thumbnail}
-            alt={row.title}
-            width={56}
-            height={56}
-            className="rounded-xl object-cover"
-          />
-
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-gray-900">{row.title}</p>
-
-            <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-              {row.description}
-            </p>
-          </div>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-gray-900">{row.title}</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {REPORT_TYPE_LABELS[row.reportType] ?? row.reportType}
+          </p>
         </div>
       ),
+    },
+
+    {
+      id: "period",
+      header: "Period",
+      cell: (row) => PERIOD_LABELS[row.period] ?? row.period ?? "—",
     },
 
     {
       id: "status",
       header: "Status",
-      cell: (row) => <ReportStatusBadge status={row.status} />,
+      cell: (row) => <StatusBadge status={row.status} />,
     },
 
     {
-      id: "author",
-      header: "Author",
-      accessorKey: "author",
+      id: "format",
+      header: "Format",
+      cell: (row) => row.fileType?.toUpperCase() ?? "—",
     },
 
     {
-      id: "category",
-      header: "Category",
-
-      cell: (row) => (
-        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium">
-          <FileText className="h-4 w-4 text-indigo-600" />
-          {row.category}
-        </div>
-      ),
-    },
-
-    // {
-    //   id: "views",
-    //   header: "Views",
-    //   cell: (row) => (
-    //     <span className="font-medium">{row.views.toLocaleString()}</span>
-    //   ),
-    // },
-
-    {
-      id: "downloads",
-      header: "Downloads",
-      cell: (row) => (
-        <span className="font-medium">{row.downloads.toLocaleString()}</span>
-      ),
-    },
-
-    {
-      id: "updatedAt",
-      header: "Last Modified",
-      accessorKey: "updatedAt",
+      id: "createdAt",
+      header: "Created",
+      cell: (row) => formatDate(row.createdAt),
     },
 
     {
       id: "actions",
       header: "",
       align: "right",
-      cell: (row) => (
-        <ActionMenu
-          row={row}
-          actions={[
-            {
-              label: "View",
-              icon: <Eye className="h-4 w-4" />,
-              onClick: () => onView?.(row),
-            },
-          ]}
-        />
-      ),
+      cell: (row) => {
+        // Files are built on demand as CSV or Excel. Older PDF reports can't be exported.
+        const canDownload =
+          row.status === "completed" && row.fileType !== "pdf";
+
+        return (
+          <ActionMenu
+            row={row}
+            actions={[
+              {
+                label: "View",
+                icon: <Eye className="h-4 w-4" />,
+                onClick: () => onView?.(row),
+              },
+              ...(canDownload
+                ? [
+                    {
+                      label: "Download",
+                      icon: <Download className="h-4 w-4" />,
+                      onClick: () => onExport?.(row),
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        );
+      },
     },
   ];
 }

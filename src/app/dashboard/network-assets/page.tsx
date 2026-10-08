@@ -20,6 +20,7 @@ import AssetIllustration from "@/components/AssetIllustration";
 import NetworkAssetCard from "@/components/network-assets/NetworkAssetCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Asset } from "@/components/assets/types";
+import { useRouter } from "next/navigation";
 
 /* =========================================================
 Types
@@ -202,6 +203,15 @@ export default function NetworkAssetsPage() {
 
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
+
+  const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
 
   useEffect(() => {
     const fetchAssetMetrics = async () => {

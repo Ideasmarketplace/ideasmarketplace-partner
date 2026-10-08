@@ -15,6 +15,8 @@ import {
 } from "@/components/network-members";
 
 import type { NetworkMetrics } from "@/components/network-members/NetworkMetricCards";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/user-store";
 
 export default function NetworkMembersPage() {
   const [selectedMember, setSelectedMember] = useState<NetworkMember | null>(
@@ -31,6 +33,15 @@ export default function NetworkMembersPage() {
 
   const [metricsLoading, setMetricsLoading] = useState(true);
 
+  const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
+
   /**
    * Fetch network metrics
    */
@@ -46,7 +57,6 @@ export default function NetworkMembersPage() {
           setMetrics(null);
         }
       } catch (error) {
-
         setMetrics(null);
       } finally {
         setMetricsLoading(false);

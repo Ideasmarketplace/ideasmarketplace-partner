@@ -18,6 +18,7 @@ import {
   PayoutSummary,
 } from "@/components/payouts";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/user-store";
 
 interface PayoutResponse {
   withdrawals?: Payout[];
@@ -58,6 +59,14 @@ export default function PayoutsPage() {
   const [totalItems, setTotalItems] = useState(0);
 
   const router = useRouter();
+
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
 
   /*
    * Fetch payout summary

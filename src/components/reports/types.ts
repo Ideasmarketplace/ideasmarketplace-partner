@@ -1,42 +1,45 @@
-export type ReportStatus =
-  | "Draft"
-  | "Published"
-  | "Scheduled";
+// types.ts
+export type ReportType = "revenue" | "assets" | "members" | "payouts" | "dashboard";
+export type ReportPeriod = "7d" | "30d" | "90d" | "6m" | "1y" | "custom";
+export type ReportFormat = "pdf" | "csv" | "xlsx";
+export type ReportStatus = "processing" | "completed" | "failed";
 
 export interface Report {
-  id: string;
+  _id: string;
   title: string;
-  description: string;
+  reportType: ReportType;
+  period: ReportPeriod;
+  startDate?: string;
+  endDate?: string;
   status: ReportStatus;
-  author: string;
-  category: string;
+  fileType?: ReportFormat;
+  fileUrl?: string;
+  fileSize?: number;
+  generatedAt?: string;
   createdAt: string;
-  updatedAt: string;
-  thumbnail: string;
-  views: number;
-  downloads: number;
-}
-
-export interface GenerateReportValues {
-  reportType: string;
-  dateRange: string;
-  category: string;
-  status: string;
-  includeCharts: boolean;
-  includeSummary: boolean;
-  includeTransactions: boolean;
-  format: "pdf" | "xlsx" | "csv";
-  delivery: "download" | "email";
-  filename: string;
-  orientation: "portrait" | "landscape";
-  paperSize: "A4" | "Letter";
-  compressImages: boolean;
-  includeBranding: boolean;
 }
 
 export interface ReportsSummary {
   totalReports: number;
-  published: number;
-  downloads: number;
-  scheduled: number;
+  completedReports: number;
+  processingReports: number;
+  failedReports: number;
+  lastGeneratedAt: string | null;
 }
+
+export interface ReportPagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
+
+export interface GenerateReportValues {
+  reportType: ReportType | "";
+  period: ReportPeriod;
+  startDate: string; // YYYY-MM-DD, only used when period is "custom"
+  endDate: string;
+  format: ReportFormat;
+  title: string;
+}
+

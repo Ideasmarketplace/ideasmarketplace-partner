@@ -1,254 +1,159 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ReportsMetricCards,
   ReportsTable,
   ReportPreviewDrawer,
   GenerateReportModal,
-  Report,
 } from "@/components/reports";
-
+import { Report } from "@/components/reports/types";
 import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDialog";
+import { toast } from "@/hooks/use-toast";
+import { useReports } from "@/hooks/use-reports";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/user-store";
 
-import { Button } from "@/components/ui/button";
-
-import { FilePlus2, Download } from "lucide-react";
-
-import Api from "@/utils/api";
-import { ReportsSummary } from "@/components/reports/types";
-
-interface GenerateReportPayload {
-  type: string;
-  startDate?: string;
-  endDate?: string;
-  format?: string;
-}
+const errorMessage = (e: any) =>
+  e?.response?.data?.message || e?.message || "Please try again.";
 
 export default function ReportsPage() {
+  const {
+    summary,
+    summaryLoading,
+    reports,
+    pagination,
+    listLoading,
+    filters,
+    setFilter,
+    setPage,
+    getReport,
+    generate,
+    exportReport,
+    removeReport,
+  } = useReports();
+
   const [generateOpen, setGenerateOpen] = useState(false);
-
-  const [exportOpen, setExportOpen] = useState(false);
-
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const [selectedReport, setSelectedReport] =
-    useState<Report | null>(null);
-
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-  const [summary, setSummary] =
-    useState<ReportsSummary | null>(null);
-
-  const [summaryLoading, setSummaryLoading] =
-    useState(true);
-
-  /**
-   * Fetch report dashboard metrics
-   */
-  const fetchReportsSummary = useCallback(async () => {
-    setSummaryLoading(true);
-
-    try {
-      const response = await Api.get(
-        "/partner/reports/summary",
-      );
-
-      if (response.data?.success) {
-        setSummary(response.data.data);
-      }
-    } catch (error) {
-      console.error(
-        "Failed to fetch reports summary:",
-        error,
-      );
-
-      setSummary(null);
-    } finally {
-      setSummaryLoading(false);
-    }
-  }, []);
+  const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
 
   useEffect(() => {
-    fetchReportsSummary();
-  }, [fetchReportsSummary]);
-
-  /**
-   * View report details
-   */
-  const handleViewReport = async (report: Report) => {
-    try {
-      const response = await Api.get(
-        `/partner/reports/${report.id}`,
-      );
-
-      if (response.data?.success) {
-        setSelectedReport(response.data.data);
-      } else {
-        setSelectedReport(report);
-      }
-    } catch (error) {
-      console.error(
-        "Failed to fetch report details:",
-        error,
-      );
-
-      setSelectedReport(report);
+    if (!userData) {
+      router.push("/");
     }
+  }, [userData, router]);
 
+  const handleView = async (report: Report) => {
+    setSelectedReport(report); // open immediately with the row data
     setDrawerOpen(true);
-  };
-
-
-  /**
-   * Export a report
-   */
-  const handleExportReport = async (
-    report: Report,
-  ) => {
-    try {
-      const response = await Api.post(
-        `/partner/reports/${report.id}/export`,
+    const details = await getReport(report._id); // then fill in the full record
+    if (details) {
+      setSelectedReport((cur) =>
+        cur?._id === report._id ? { ...report, ...details } : cur,
       );
-
-      if (!response.data?.success) {
-        throw new Error(
-          response.data?.message ||
-            "Failed to export report.",
-        );
-      }
-
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Failed to export report:",
-        error,
-      );
-
-      throw error;
     }
   };
 
-  /**
-   * Delete report
-   */
-  const handleDeleteReport = async () => {
-    if (!selectedReport) return;
-
+  const handleExport = async (report: Report) => {
     try {
-      const response = await Api.delete(
-        `/partner/reports/${selectedReport.id}`,
-      );
+      await exportReport(report);
+      toast({ title: "Download started" });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: errorMessage(error),
+        variant: "destructive",
+      });
+    }
+  };
 
-      if (!response.data?.success) {
-        throw new Error(
-          response.data?.message ||
-            "Failed to delete report.",
-        );
-      }
+  const handleGenerate = async (values: Parameters<typeof generate>[0]) => {
+    const report = await generate(values); // errors bubble up so the modal shows the toast
+    toast({
+      title: "Report created",
+      description: "Use the download button in the table to get the file.",
+    });
+    return report;
+  };
 
+  const handleDelete = async () => {
+    if (!selectedReport) return;
+    try {
+      await removeReport(selectedReport._id);
+      toast({ title: "Report deleted" });
       setDeleteOpen(false);
       setDrawerOpen(false);
       setSelectedReport(null);
-
-      await fetchReportsSummary();
     } catch (error) {
-      console.error(
-        "Failed to delete report:",
-        error,
-      );
+      toast({
+        title: "Could not delete report",
+        description: errorMessage(error),
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <div className="min-h-screen">
-      <div className="flex">
-        {/* Main Content */}
-        <main className="min-w-0 flex-1">
-          <div className="space-y-6">
-            {/* Header */}
+      <main className="min-w-0 flex-1">
+        <div className="space-y-6">
+          <section>
+            <h1 className="text-4xl font-bold tracking-tight">Reports</h1>
+            <p className="mt-2 text-gray-500">
+              Generate and download revenue, payout, asset and member reports.
+            </p>
+          </section>
 
-            <section className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h1 className="text-4xl font-bold tracking-tight">
-                  Reports
-                </h1>
+          <ReportsMetricCards data={summary} loading={summaryLoading} />
 
-                <p className="mt-2 text-gray-500">
-                  Generate, analyze and export detailed
-                  business reports.
-                </p>
-              </div>
+          <ReportsTable
+            reports={reports}
+            loading={listLoading}
+            pagination={pagination}
+            search={filters.search}
+            status={filters.status}
+            reportType={filters.reportType}
+            onSearch={(search) => setFilter({ search })}
+            onStatusChange={(status) => setFilter({ status })}
+            onTypeChange={(reportType) => setFilter({ reportType })}
+            onPageChange={setPage}
+            onCreateReport={() => setGenerateOpen(true)}
+            onView={handleView}
+            onExport={handleExport}
+          />
 
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  onClick={() => setExportOpen(true)}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Export Reports
-                </Button>
+          <ReportPreviewDrawer
+            open={drawerOpen}
+            onOpenChange={setDrawerOpen}
+            report={selectedReport}
+            onExport={handleExport}
+            onDelete={(report) => {
+              setSelectedReport(report);
+              setDeleteOpen(true);
+            }}
+          />
 
-                <Button
-                  className="rounded-xl bg-indigo-600"
-                  onClick={() =>
-                    setGenerateOpen(true)
-                  }
-                >
-                  <FilePlus2 className="mr-2 h-4 w-4" />
-                  Generate Report
-                </Button>
-              </div>
-            </section>
+          <GenerateReportModal
+            open={generateOpen}
+            onOpenChange={setGenerateOpen}
+            onGenerate={handleGenerate}
+          />
 
-            {/* Metrics */}
-
-            <ReportsMetricCards
-              data={summary}
-            />
-
-            {/* Reports Table */}
-
-            <ReportsTable
-              onCreateReport={() =>
-                setGenerateOpen(true)
-              }
-              onView={handleViewReport}
-            />
-
-            {/* Report Preview Drawer */}
-
-            <ReportPreviewDrawer
-              open={drawerOpen}
-              onOpenChange={setDrawerOpen}
-              report={selectedReport}
-            />
-
-            {/* Generate Report Modal */}
-
-            <GenerateReportModal
-              open={generateOpen}
-              onOpenChange={setGenerateOpen}
-            />
-
-            {/* Delete Report */}
-
-            <DeleteConfirmationDialog
-              open={
-                deleteOpen &&
-                !!selectedReport
-              }
-              onOpenChange={setDeleteOpen}
-              title="Delete Report"
-              itemName={selectedReport?.title}
-              description="This report will be permanently deleted."
-              onConfirm={handleDeleteReport}
-            />
-          </div>
-        </main>
-      </div>
+          <DeleteConfirmationDialog
+            open={deleteOpen && !!selectedReport}
+            onOpenChange={setDeleteOpen}
+            title="Delete report"
+            itemName={selectedReport?.title}
+            description="This report will be permanently deleted."
+            onConfirm={handleDelete}
+          />
+        </div>
+      </main>
     </div>
   );
 }
