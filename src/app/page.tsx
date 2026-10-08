@@ -17,9 +17,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Logo from "@/assets/logo.png"
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { useUserStore } from "@/utils/user-store";
 import { csrfStore } from "@/utils/global-state-store";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -100,8 +102,8 @@ const Login = () => {
         <div className="w-full max-w-md animate-fade-in">
           {/* Logo/Brand */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white backdrop-blur-md rounded-full mb-4 border border-white/20">
-              <User className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-white backdrop-blur-md rounded-full mb-4 border border-white/20">
+              <Image src={Logo} alt="logo" width={60} height={60} />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Welcome</h1>
             <p className="text-white/70">Sign in to continue your journey</p>

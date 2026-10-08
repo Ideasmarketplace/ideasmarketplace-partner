@@ -16,6 +16,8 @@ import DeleteConfirmationDialog from "@/components/common/DeleteConfirmationDial
 
 import Api from "@/utils/api";
 import { TopPerformingAsset } from "@/components/revenue/TopPerformingAssets";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/user-store";
 
 interface RevenueMetrics {
   totalRevenue: number;
@@ -35,7 +37,7 @@ interface Transactions {
   customer: string;
   amount: number;
   status: string;
-  date: any
+  date: any;
 }
 
 export default function RevenuePage() {
@@ -49,7 +51,7 @@ export default function RevenuePage() {
     RevenueBreakdownItem[]
   >([]);
 
-  const [transactions, setTransactions] = useState(null)
+  const [transactions, setTransactions] = useState(null);
 
   const [loadingMetrics, setLoadingMetrics] = useState(true);
 
@@ -64,6 +66,15 @@ export default function RevenuePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
 
   /**
    * Fetch revenue metrics
@@ -121,7 +132,7 @@ export default function RevenuePage() {
     const fetchRevenueBreakdown = async () => {
       try {
         setLoadingBreakdown(true);
-        const response = await Api.get("partner/revenue/breakdown"); 
+        const response = await Api.get("partner/revenue/breakdown");
         if (response.data?.success) {
           setRevenueBreakdown(response.data.data || []);
         } else {
@@ -136,7 +147,6 @@ export default function RevenuePage() {
 
     fetchRevenueBreakdown();
   }, []);
-
 
   return (
     <div className="space-y-8">

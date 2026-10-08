@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-
 import {
   AssetsMetricCards,
   AssetsTable,
@@ -17,6 +16,8 @@ import AssetDetailsDrawer from "@/components/assets/AssetDetailsDrawer";
 import { Asset } from "@/components/assets/types";
 
 import Api from "@/utils/api";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/user-store";
 
 interface AssetMetrics {
   audio?: {
@@ -62,6 +63,15 @@ export default function AssetsPage() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
+
   /**
    * ==========================
    * Fetch Asset Metrics
@@ -102,7 +112,6 @@ export default function AssetsPage() {
         }
       }
     } catch (error) {
-
       setError("Unable to load your assets. Please try again.");
     } finally {
       setLoadingAssets(false);

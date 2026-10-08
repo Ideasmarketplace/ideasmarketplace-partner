@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserStore } from "@/utils/user-store";
 import BankDetailsCard from "@/components/profile/BankDetailsCard";
+import { useRouter } from "next/navigation";
 
 interface Profile {
   companyName?: string;
@@ -55,6 +56,14 @@ export default function ProfilePage() {
   const [completion, setCompletion] = useState<Completion | null>(null);
   const [loading, setLoading] = useState(true);
   const userData = useUserStore((state) => state.userData);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
 
   return (
     <div className="min-h-screen">
@@ -268,18 +277,12 @@ export default function ProfilePage() {
 
               <TabsContent value="edit" className="mt-6 space-y-6">
                 <section className="grid gap-6 xl:grid-cols-2">
-                  <CompanyInformationCard
-                    profile={userData}
-                  />
+                  <CompanyInformationCard profile={userData} />
 
-                  <CommunityInformationCard
-                    profile={userData}
-                  />
+                  <CommunityInformationCard profile={userData} />
                 </section>
 
-                <ContactInformationCard
-                  profile={userData}
-                />
+                <ContactInformationCard profile={userData} />
 
                 <BankDetailsCard />
 

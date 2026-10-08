@@ -3,15 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  Bell,
-  ChevronDown,
-  Menu,
-  Search,
-  X,
-  User,
-  LogOut,
-} from "lucide-react";
+import { Bell, ChevronDown, Menu, Search, X, User, LogOut } from "lucide-react";
 
 import Api from "@/utils/api";
 import { useUserStore } from "@/utils/user-store";
@@ -53,10 +45,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -66,9 +55,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     }
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
       setSearchQuery("");
       setIsSearchExpanded(false);
@@ -110,18 +97,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           {/* Expandable Search Container */}
-          <div
+          {/* <div
             className={`relative flex h-11 items-center border border-gray-200 bg-white transition-all duration-300 ease-in-out ${
               isSearchExpanded
                 ? "w-64 rounded-2xl px-3 sm:w-80 border-sky-500 ring-2 ring-sky-500/20"
                 : "w-11 justify-center rounded-full hover:bg-gray-100 cursor-pointer"
             }`}
-            onClick={() =>
-              !isSearchExpanded &&
-              setIsSearchExpanded(true)
-            }
+            onClick={() => !isSearchExpanded && setIsSearchExpanded(true)}
           >
-            {/* Search Icon */}
             <button
               type="button"
               className="flex items-center justify-center text-gray-600 focus:outline-none"
@@ -135,7 +118,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <Search className="h-5 w-5 shrink-0" />
             </button>
 
-            {/* Expanded Input Field */}
             {isSearchExpanded && (
               <>
                 <input
@@ -143,9 +125,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   type="text"
                   placeholder="Search assets, network members..."
                   value={searchQuery}
-                  onChange={(e) =>
-                    setSearchQuery(e.target.value)
-                  }
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   onBlur={handleBlur}
                   onKeyDown={handleKeyDown}
                   className="w-full bg-transparent pl-3 pr-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
@@ -164,7 +144,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </button>
               </>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Right Section */}
@@ -176,23 +156,24 @@ export default function Header({ onMenuClick }: HeaderProps) {
               5
             </span>
           </button> */}
+          <div>{userData?.companyName}</div>
 
           {/* Profile Dropdown */}
-          <div
-            ref={profileRef}
-            className="relative"
-          >
+          <div ref={profileRef} className="relative">
             <button
               type="button"
-              onClick={() =>
-                setIsProfileOpen((prev) => !prev)
-              }
+              onClick={() => setIsProfileOpen((prev) => !prev)}
               className="flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1 pl-1 pr-3 transition hover:bg-gray-100"
               aria-expanded={isProfileOpen}
               aria-haspopup="menu"
             >
               <Image
-                src={userData?.photo || "https://ui-avatars.com/api/?name=User&background=random"}
+                src={
+                  userData?.photo ||
+                  `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
+                    `${userData?.companyName || "User"}`,
+                  )}`
+                }
                 alt="Profile"
                 width={40}
                 height={40}
@@ -236,9 +217,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 >
                   <LogOut className="h-4 w-4" />
 
-                  <span>
-                    {loggingOut ? "Logging out..." : "Logout"}
-                  </span>
+                  <span>{loggingOut ? "Logging out..." : "Logout"}</span>
                 </button>
               </div>
             )}

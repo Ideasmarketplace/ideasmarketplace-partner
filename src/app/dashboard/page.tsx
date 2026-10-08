@@ -179,6 +179,13 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+
+  useEffect(() => {
+    if (!userData) {
+      router.push("/");
+    }
+  }, [userData, router]);
 
   /* =========================================================
      Fetch Dashboard Overview
@@ -487,9 +494,9 @@ export default function DashboardPage() {
         ===================================================== */}
 
         <section className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 xl:col-span-7">
+          {/* <div className="col-span-12 xl:col-span-7">
             <ActivityCard />
-          </div>
+          </div> */}
 
           <div className="col-span-12 md:col-span-6 xl:col-span-5">
             <CommunityCard

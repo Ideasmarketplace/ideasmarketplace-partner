@@ -1,30 +1,54 @@
 "use client";
 
 import {
-  BarChart3,
-  ImageIcon,
-  Users,
-  Wallet,
   CheckCircle2,
+  LayoutDashboard,
+  Landmark,
+  Package,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { REPORT_TYPES } from "./report-types";
-import { GenerateReportValues } from "./types";
+import { REPORT_TYPE_LABELS } from "./report-options";
+import { GenerateReportValues, ReportType } from "./types";
+
+const reportTypes: {
+  id: ReportType;
+  description: string;
+  icon: React.ElementType;
+}[] = [
+  {
+    id: "revenue",
+    description: "Earnings, commissions and transactions",
+    icon: TrendingUp,
+  },
+  {
+    id: "payouts",
+    description: "Withdrawal requests and payout history",
+    icon: Landmark,
+  },
+  {
+    id: "assets",
+    description: "Your assets and your network's assets",
+    icon: Package,
+  },
+  {
+    id: "members",
+    description: "Referred members and their activity",
+    icon: Users,
+  },
+  {
+    id: "dashboard",
+    description: "A summary across every area",
+    icon: LayoutDashboard,
+  },
+];
 
 interface ReportTypeStepProps {
   value: GenerateReportValues;
-  onChange: (
-    values: Partial<GenerateReportValues>
-  ) => void;
+  onChange: (values: Partial<GenerateReportValues>) => void;
 }
-
-const icons = {
-  assets: ImageIcon,
-  payouts: Wallet,
-  network: Users,
-  revenue: BarChart3,
-};
 
 export default function ReportTypeStep({
   value,
@@ -33,54 +57,41 @@ export default function ReportTypeStep({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold">
-          Select Report Type
-        </h2>
-
+        <h2 className="text-2xl font-semibold">Choose a report type</h2>
         <p className="mt-2 text-gray-500">
-          Choose the report you want to generate.
+          Select the kind of report you want to generate.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {REPORT_TYPES.map((type) => {
-          const Icon =
-            icons[type.id as keyof typeof icons];
-
-          const active =
-            value.reportType === type.id;
+      <div
+        role="radiogroup"
+        aria-label="Report type"
+        className="grid gap-4 sm:grid-cols-2"
+      >
+        {reportTypes.map((type) => {
+          const Icon = type.icon;
+          const active = value.reportType === type.id;
 
           return (
             <button
               key={type.id}
               type="button"
-              onClick={() =>
-                onChange({
-                  reportType: type.id,
-                })
-              }
+              role="radio"
+              aria-checked={active}
+              onClick={() => onChange({ reportType: type.id })}
               className={cn(
-                "relative rounded-3xl border bg-white p-6 text-left transition-all",
+                "relative rounded-2xl border bg-white p-5 text-left transition-all",
                 active
                   ? "border-indigo-600 ring-2 ring-indigo-100"
-                  : "border-gray-200 hover:border-indigo-300 hover:shadow-md"
+                  : "border-gray-200 hover:border-indigo-300",
               )}
             >
               {active && (
-                <CheckCircle2 className="absolute right-5 top-5 h-6 w-6 text-indigo-600" />
+                <CheckCircle2 className="absolute right-4 top-4 h-5 w-5 text-indigo-600" />
               )}
-
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50">
-                <Icon className="h-7 w-7 text-indigo-600" />
-              </div>
-
-              <h3 className="text-lg font-semibold">
-                {type.title}
-              </h3>
-
-              <p className="mt-2 text-sm text-gray-500">
-                {type.description}
-              </p>
+              <Icon className="mb-4 h-8 w-8 text-indigo-600" />
+              <h3 className="font-semibold">{REPORT_TYPE_LABELS[type.id]}</h3>
+              <p className="mt-1 text-sm text-gray-500">{type.description}</p>
             </button>
           );
         })}

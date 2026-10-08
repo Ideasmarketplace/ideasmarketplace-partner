@@ -1,3 +1,31 @@
+import type { ReportPeriod } from "./types";
+
+export const REPORT_TYPE_LABELS: Record<string, string> = {
+  revenue: "Revenue",
+  payouts: "Payouts",
+  assets: "Assets",
+  members: "Members",
+  dashboard: "Dashboard overview",
+};
+
+export const PERIOD_OPTIONS: { value: ReportPeriod; label: string }[] = [
+  { value: "7d", label: "Last 7 days" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "90d", label: "Last 90 days" },
+  { value: "6m", label: "Last 6 months" },
+  { value: "1y", label: "Last 12 months" },
+  { value: "custom", label: "Custom range" },
+];
+
+export const PERIOD_LABELS: Record<string, string> = Object.fromEntries(
+  PERIOD_OPTIONS.map((o) => [o.value, o.label]),
+);
+
+export const FORMAT_LABELS: Record<string, string> = {
+  pdf: "PDF", xlsx: "Excel", csv: "CSV",
+};
+
+
 export const REPORT_TYPE_OPTIONS = [
   {
     value: "assets",
