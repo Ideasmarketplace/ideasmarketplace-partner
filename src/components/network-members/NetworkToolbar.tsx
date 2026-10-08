@@ -46,7 +46,7 @@ export default function NetworkToolbar({
         </div>
 
         {/* Status */}
-        <Select
+        {/* <Select
           value={status}
           onValueChange={onStatusChange}
         >
@@ -71,7 +71,7 @@ export default function NetworkToolbar({
               Suspended
             </SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
       </div>
 
       {/* <Button onClick={onInvite}>
