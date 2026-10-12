@@ -95,7 +95,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
     try {
       set({ isLoggingOut: true });
 
-      await Api.post("auth/logout", {}, { withCredentials: true });
+      await Api.post("partner/auth/logout", {}, { withCredentials: true });
 
       delete Api.defaults.headers.common["Authorization"];
 
