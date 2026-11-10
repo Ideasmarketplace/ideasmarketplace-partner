@@ -6,3 +6,5 @@ export const PAYOUTS = '/dashboard/payouts';
 export const PROFILE = '/dashboard/profile';
 export const SETTINGS = '/dashboard/settings';
 export const LOGIN = "/";
+export const FORGOTPASSWORD = "/forgot-password";
+export const RESETPASSWORD = "/reset-password";
