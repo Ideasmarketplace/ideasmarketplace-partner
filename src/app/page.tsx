@@ -1,59 +1,46 @@
 "use client";
 
-import { HOME } from "@/constants/path";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Loader2, Mail } from "lucide-react";
+import { HOME, FORGOTPASSWORD } from "@/constants/path";
 import { toast } from "@/hooks/use-toast";
 import Api from "@/utils/api";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useCookies } from "react-cookie";
+import { useUserStore } from "@/utils/user-store";
+import { csrfStore } from "@/utils/global-state-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Logo from "@/assets/logo.png"
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
-import { useUserStore } from "@/utils/user-store";
-import { csrfStore } from "@/utils/global-state-store";
-
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { PasswordInput } from "@/components/auth/password-input";
+import { AnimatedContent } from "@/components/auth/animated-content";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const login = useUserStore((state) => state.login);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLoading) return;
+
     try {
       setIsLoading(true);
 
-      const payload = {
-        email,
-        password,
-      };
+      const response = await Api.post("partner/auth/login", { email, password });
 
-      const response = await Api.post("partner/auth/login", payload);
       if (response.status === 200) {
         const { accessToken, partner, csrfToken } = response.data.data;
 
-        if (csrfToken) {
-          csrfStore.setToken(csrfToken);
-        }
+        if (csrfToken) csrfStore.setToken(csrfToken);
 
         login(partner, accessToken);
-
         Api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
         const previousRoute = sessionStorage.getItem("previousRoute");
-
         if (previousRoute) {
           router.push(previousRoute);
           sessionStorage.removeItem("previousRoute");
@@ -62,9 +49,7 @@ const Login = () => {
         }
       }
     } catch (error: any) {
-
       setIsLoading(false);
-
       toast({
         title: "Login failed",
         description:
@@ -76,118 +61,80 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background Images */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-cover blur-sm scale-110"
-        />
-        <img
-          src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-          alt="Background"
-          className="absolute top-0 right-0 w-1/2 h-full object-cover blur-sm scale-110 opacity-60"
-        />
-        <img
-          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-          alt="Background"
-          className="absolute bottom-0 left-0 w-1/2 h-2/3 object-cover blur-sm scale-110 opacity-40"
-        />
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
+    <AuthLayout>
+      <AnimatedContent>
 
-      {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in">
-          {/* Logo/Brand */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-white backdrop-blur-md rounded-full mb-4 border border-white/20">
-              <Image src={Logo} alt="logo" width={60} height={60} />
+        <div className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-slate-500">
+            Sign in to continue to your dashboard.
+          </p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+              Email
+            </Label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-12 rounded-xl border-slate-200 bg-slate-50/60 pl-11 transition-all focus-visible:border-indigo-500 focus-visible:bg-white focus-visible:ring-4 focus-visible:ring-indigo-500/10"
+              />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome</h1>
-            <p className="text-white/70">Sign in to continue your journey</p>
           </div>
 
-          {/* Login Card */}
-          <Card className="bg-white backdrop-blur-md border-white/20 shadow-2xl">
-            <CardHeader className="py-5 flex flex-col">
-              <CardTitle className="text-2xl font-semibold text-center">
-                Sign In
-              </CardTitle>
-              <CardDescription className="text-center">
-                Enter your credentials to access your account
-              </CardDescription>
-            </CardHeader>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+                Password
+              </Label>
+              <Link
+                href={FORGOTPASSWORD}
+                className="text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-700"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-            <CardContent className="space-y-4">
-              <form className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="">
-                    Email
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 py-5"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10 py-5"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white/70 transition-colors"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  onClick={handleLogin}
-                  disabled={isLoading || !email || !password}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
-                >
-                  {isLoading ? "Please wait..." : "Sign In"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-white/5 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-20 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl animate-pulse delay-500"></div>
-    </div>
+          <Button
+            type="submit"
+            disabled={isLoading || !email || !password}
+            className="group h-12 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-base font-medium text-white shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 hover:brightness-110 disabled:opacity-60"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign in
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+          </Button>
+        </form>
+      </AnimatedContent>
+    </AuthLayout>
   );
 };
 

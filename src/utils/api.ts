@@ -13,26 +13,26 @@ const Api = axios.create({
 Api.interceptors.request.use(
   (config) => {
     const csrfToken = csrfStore.getToken();
-    const method = config.method ? config.method.toLowerCase() : ''
+    const method = config.method ? config.method.toLowerCase() : "";
     if (csrfToken && PROTECTED_METHODS.includes(method)) {
-        config.headers[CSRF_HEADER_NAME] = csrfToken;
+      config.headers[CSRF_HEADER_NAME] = csrfToken;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 Api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-    if (status === 403) {
-      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-         window.location.href = "/login"; 
+    if (status === 401) {
+      if (typeof window !== "undefined" && window.location.pathname !== "/") {
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default Api;
