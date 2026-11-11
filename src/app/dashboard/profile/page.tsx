@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   Building2,
@@ -28,6 +28,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserStore } from "@/utils/user-store";
 import BankDetailsCard from "@/components/profile/BankDetailsCard";
 import { useRouter } from "next/navigation";
+import Api from "@/utils/api";
+import { toast } from "@/hooks/use-toast";
 
 interface Profile {
   companyName?: string;
@@ -41,7 +43,7 @@ interface Profile {
   website?: string;
   location?: string;
   logo?: string;
-  profileImage?: string;
+  photo?: string;
 }
 
 interface Completion {
@@ -57,13 +59,44 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const userData = useUserStore((state) => state.userData);
 
+  const isLoggedIn = !!userData;
   const router = useRouter();
 
-  useEffect(() => {
-    if (!userData) {
-      router.push("/");
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await Api.get("partner/profile");
+      setProfile(res.data.data);
+    } catch (error: any) {
+      toast({
+        title: "Couldn't load profile",
+        description: error?.response?.data?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [userData, router]);
+  }, []);
+
+  const fetchCompletion = useCallback(async () => {
+    try {
+      const res = await Api.get("partner/profile/completion");
+      setCompletion(res.data.data);
+    } catch {
+      // The completion card is optional, so fail quietly.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.push("/");
+      return;
+    }
+    fetchProfile();
+    fetchCompletion();
+  }, [isLoggedIn, router, fetchProfile, fetchCompletion]);
+
+  // Fetched profile wins. The store copy covers the first render only.
+  const view = profile ?? userData;
 
   return (
     <div className="min-h-screen">
@@ -117,10 +150,10 @@ export default function ProfilePage() {
 
                       <div className="mb-8 flex flex-col gap-5 border-b pb-8 sm:flex-row sm:items-center">
                         <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gray-100">
-                          {userData?.photo ? (
+                          {view?.photo ? (
                             <img
-                              src={userData?.photo}
-                              alt={userData.companyName || "userData"}
+                              src={view.photo}
+                              alt={view.companyName || "Company logo"}
                               className="h-full w-full object-cover"
                             />
                           ) : (
@@ -237,25 +270,25 @@ export default function ProfilePage() {
                             <ProfileInfoRow
                               icon={Mail}
                               label="Email"
-                              value={userData?.email}
+                              value={view?.email}
                             />
 
                             <ProfileInfoRow
                               icon={Phone}
                               label="Phone"
-                              value={userData?.phoneNumber}
+                              value={view?.phoneNumber}
                             />
 
                             <ProfileInfoRow
                               icon={Globe}
                               label="Website"
-                              value={userData?.website}
+                              value={view?.website}
                             />
 
                             <ProfileInfoRow
                               icon={MapPin}
                               label="Location"
-                              value={userData?.location}
+                              value={view?.location}
                             />
                           </div>
                         </div>
@@ -277,16 +310,16 @@ export default function ProfilePage() {
 
               <TabsContent value="edit" className="mt-6 space-y-6">
                 <section className="grid gap-6 xl:grid-cols-2">
-                  <CompanyInformationCard profile={userData} />
+                  <CompanyInformationCard profile={view} />
 
-                  <CommunityInformationCard profile={userData} />
+                  <CommunityInformationCard profile={view} />
                 </section>
 
-                <ContactInformationCard profile={userData} />
+                <ContactInformationCard profile={view} />
 
                 <BankDetailsCard />
 
-                <LogoUploader profile={userData} />
+                <LogoUploader profile={view} />
               </TabsContent>
 
               {/* ================================================= */}
